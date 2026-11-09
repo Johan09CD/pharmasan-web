@@ -1,5 +1,17 @@
 # Progreso
 
+## 2026-11-09 — Sincronización de intervalos de confianza de Wq
+
+- **Hecho:** actualizado `data/observados.json` desde el exportador del
+  repositorio `pharmasan-sim`, con los límites del IC 95 % del Wq medio en
+  todos los escenarios, sin añadir cifras manualmente.
+- **Archivos:** `data/observados.json`, `docs/PROGRESO.md` y
+  `docs/DECISIONES.md`.
+- **Resultados:** los intervalos del escenario base son
+  `[0.137023803739987, 0.1700480084692139]`; las copias de ambos proyectos
+  coinciden byte por byte. La suite Python completa pasó 71 pruebas.
+- **Pendiente:** ninguno para la exportación; continuar la fase activa del plan.
+
 ## 2026-11-09 — Diagnóstico y corrección del caso base
 
 - **Hecho:** trazada la implementación Python; aisladas las hipótesis de

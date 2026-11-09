@@ -43,3 +43,7 @@
   `pharmasan-sim/src/pharmasan_sim/experimentos.py` (selección de la regla de
   asignación). La media y el IC Python se contrastaron además ejecutando 500
   réplicas sin guardar archivos y coinciden con `outputs/tablas/escenarios.csv`.
+- Los límites del IC 95 % de Wq de cada escenario en `data/observados.json`
+  provienen de `wq_media_ic95_inferior` y `wq_media_ic95_superior` en
+  `pharmasan-sim/outputs/tablas/escenarios.csv`; el exportador Python es la
+  única fuente del JSON y no se mantienen valores manuales.
