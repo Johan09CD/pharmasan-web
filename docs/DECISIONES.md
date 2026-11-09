@@ -54,3 +54,14 @@
   escenario base de `referencia_python.escenarios` y sus límites exportados
   `wq_ic95_inferior`/`wq_ic95_superior`; solo el resultado dentro del intervalo
   se marca en verde. No se editaron manualmente los datos exportados.
+- «Reproducir lo observado» filtra por día y por los IDs de `pico` exportados
+  (o muestra la jornada completa) y conserva para cada paciente llegada,
+  ventanilla, inicio y atención reales mediante el modo `replay` existente.
+  Cuando se seleccionan los tres días, cada uno se simula en una corrida aparte
+  para no tratar como simultáneos eventos de jornadas distintas. La referencia
+  seleccionada se calcula desde los registros observados; sus agregados
+  coinciden con `cifras_verificadas` para la selección de los tres días.
+  Diferencias nulas se indican en verde; si la corrida no coincide, se muestra
+  el valor de diferencia en ámbar y una explicación. La tabla de pacientes y
+  la línea de tiempo usan la salida de replay, con carriles separados por día
+  y ventanilla. `data/observados.json` y los módulos del motor no se editan.

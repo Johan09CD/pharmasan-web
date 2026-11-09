@@ -1,5 +1,24 @@
 # Progreso
 
+## 2026-11-09 — Selector y reproducción de observaciones
+
+- **Hecho:** comparado el Prompt 3 con lo implementado. El motor y su prueba
+  cubrían replay, pero faltaban selectores de día/tramo, la opción visible de
+  reproducir las atenciones reales, la comparación y las vistas para usuarios.
+  Añadidos selector Lunes/Martes/Viernes/Los tres, tramo hora pico/jornada,
+  panel de cifras verificadas, comparación con diferencias y estados verde o
+  ámbar con explicación, tabla y línea de tiempo por día/ventanilla.
+- **Archivos:** `index.html`, `src/ui/app.js`, `src/ui/estilos.css`,
+  `src/ui/reproduccion-observados.js`, `tests/reproduccion_observados.test.js`,
+  `README.md`, `docs/PLAN.md`, `docs/PROGRESO.md` y `docs/DECISIONES.md`.
+- **Resultados:** Los tres días, hora pico: **71 pacientes**, **7 esperaron**,
+  Wq **0,155 min**; diferencias contra cifras verificadas: **0, 0 y 0**.
+  Jornada completa en los tres días: **131 pacientes**, **15 esperaron**.
+  `node --test`: **29 pruebas aprobadas, 0 fallidas**; validación en navegador
+  de los controles, comparación y reproducción de Lunes jornada completa (**47
+  pacientes**). `data/observados.json` y `src/engine/` no se modificaron.
+- **Pendiente:** fase 4, crear la escena 3D.
+
 ## 2026-11-09 — Simulación observada y comparación Python en la interfaz
 
 - **Hecho:** conectado el botón «Volver a simular con las llegadas observadas»

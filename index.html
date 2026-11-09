@@ -31,6 +31,99 @@
         </p>
       </section>
 
+      <section class="panel" aria-labelledby="titulo-replay">
+        <h2 id="titulo-replay">Reproducir lo observado</h2>
+        <p>
+          Esta opción vuelve a pasar por la atención que ocurrió en Pharmasan:
+          cada paciente conserva su hora de llegada, ventanilla, hora de inicio
+          y duración real del servicio. No sortea nuevos tiempos.
+        </p>
+        <div class="controles-replay">
+          <label for="dia-observado">Día</label>
+          <select id="dia-observado" disabled>
+            <option value="Los tres">Los tres</option>
+            <option value="Lunes">Lunes</option>
+            <option value="Martes">Martes</option>
+            <option value="Viernes">Viernes</option>
+          </select>
+
+          <label for="tramo-observado">Tramo</label>
+          <select id="tramo-observado" disabled>
+            <option value="hora_pico">Hora pico (08:02–09:02)</option>
+            <option value="jornada_completa">Jornada completa</option>
+          </select>
+        </div>
+        <p class="ayuda">
+          Los minutos del archivo comienzan a las 08:00. “Los tres” reproduce
+          cada día por separado para no mezclar eventos de jornadas distintas.
+          En hora pico se muestran las llegadas entre 08:02 y 09:02 incluidas.
+        </p>
+        <button id="reproducir-observado" type="button" disabled>
+          Reproducir lo observado
+        </button>
+        <p id="estado-replay" class="estado" role="status" aria-live="polite">
+          Cargando observaciones…
+        </p>
+      </section>
+
+      <section
+        id="resultados-replay"
+        class="panel"
+        aria-labelledby="titulo-resultados-replay"
+        hidden
+      >
+        <h2 id="titulo-resultados-replay">Resultado de la reproducción</h2>
+        <p id="resumen-seleccion" class="nota-resultados"></p>
+        <div class="tabla-desplazable">
+          <table>
+            <caption>Comparación con las cifras verificadas</caption>
+            <thead>
+              <tr>
+                <th scope="col">Indicador</th>
+                <th scope="col">Cifra verificada</th>
+                <th scope="col">Corrida</th>
+                <th scope="col">Diferencia</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-comparacion"></tbody>
+          </table>
+        </div>
+        <p id="estado-comparacion" class="comparacion" role="status" aria-live="polite"></p>
+
+        <details class="cifras-completas">
+          <summary>Ver todas las cifras verificadas exportadas</summary>
+          <dl id="lista-cifras"></dl>
+        </details>
+
+        <h3>Tabla de pacientes reproducidos</h3>
+        <div class="tabla-desplazable">
+          <table>
+            <caption>Llegada, atención y espera por paciente</caption>
+            <thead>
+              <tr>
+                <th scope="col">Paciente</th>
+                <th scope="col">Día</th>
+                <th scope="col">Grupo</th>
+                <th scope="col">Llegada</th>
+                <th scope="col">Ventanilla</th>
+                <th scope="col">Inicio</th>
+                <th scope="col">Atención</th>
+                <th scope="col">Espera</th>
+                <th scope="col">Fin</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-pacientes"></tbody>
+          </table>
+        </div>
+
+        <h3>Línea de tiempo de atención</h3>
+        <p class="nota-resultados">
+          Cada barra representa el servicio observado desde su inicio hasta su
+          finalización. Los carriles separan días y ventanillas.
+        </p>
+        <div id="linea-tiempo" class="linea-tiempo"></div>
+      </section>
+
       <section id="resultados" class="panel panel-resultados" aria-labelledby="titulo-resultados" hidden>
         <h2 id="titulo-resultados">Comparación del caso base</h2>
         <p class="nota-resultados">

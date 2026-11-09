@@ -60,6 +60,14 @@ Python y muestra en verde si cae dentro del IC 95 % exportado. La primera tanda
 usa la semilla exportada y las siguientes tandas continúan con bloques de 500
 semillas consecutivas.
 
+«Reproducir lo observado» permite elegir Lunes, Martes, Viernes o los tres, y
+la hora pico (08:02–09:02, con extremos incluidos) o la jornada completa.
+Reproduce las llegadas, ventanillas e inicios y duraciones de atención
+registrados; al elegir los tres días, cada día se ejecuta por separado. La
+comparación muestra pacientes, pacientes que esperaron y Wq frente a los
+registros verificados, junto con su diferencia. También presenta las cifras
+exportadas, una tabla por paciente y una línea de tiempo por día y ventanilla.
+
 Ejecuta todas las pruebas con:
 
 ```powershell

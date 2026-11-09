@@ -95,6 +95,39 @@ button:disabled {
   opacity: 0.65;
 }
 
+.controles-replay {
+  display: grid;
+  grid-template-columns: auto minmax(180px, 1fr);
+  gap: 0.75rem 1rem;
+  align-items: center;
+  max-width: 480px;
+  margin: 1.25rem 0;
+}
+
+.controles-replay label {
+  font-weight: 650;
+}
+
+.controles-replay select {
+  min-height: 2.5rem;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid #afc5b7;
+  border-radius: 0.45rem;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+}
+
+.controles-replay select:focus-visible {
+  outline: 3px solid #92c8a9;
+  outline-offset: 2px;
+}
+
+.ayuda {
+  max-width: 68ch;
+  font-size: 0.9rem;
+}
+
 .estado {
   min-height: 1.5em;
   margin: 1rem 0 0;
@@ -155,6 +188,129 @@ button:disabled {
 .comparacion-fuera {
   background: #fff0ed;
   color: #9c2c1f;
+}
+
+.comparacion-diferente {
+  background: #fff3d6;
+  color: #76520a;
+}
+
+.tabla-desplazable {
+  overflow-x: auto;
+  margin: 1rem 0;
+  border: 1px solid #d5e2d9;
+  border-radius: 0.65rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+caption {
+  padding: 0.75rem 1rem;
+  color: #496258;
+  font-weight: 650;
+  text-align: left;
+}
+
+th,
+td {
+  padding: 0.65rem 0.75rem;
+  border-top: 1px solid #e4ece7;
+  white-space: nowrap;
+}
+
+th {
+  background: #f3f7f4;
+  font-size: 0.82rem;
+}
+
+td small {
+  display: block;
+  max-width: 25rem;
+  color: #496258;
+  white-space: normal;
+}
+
+.cifras-completas {
+  margin: 1.25rem 0 2rem;
+}
+
+.cifras-completas summary {
+  color: #206344;
+  cursor: pointer;
+  font-weight: 650;
+}
+
+.cifras-completas dl {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.8fr) minmax(0, 1.2fr);
+  gap: 0;
+  margin: 0.75rem 0;
+}
+
+.cifras-completas dt,
+.cifras-completas dd {
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid #e4ece7;
+}
+
+.cifras-completas dt {
+  font-weight: 650;
+}
+
+.linea-tiempo {
+  display: grid;
+  gap: 0.6rem;
+  overflow-x: auto;
+}
+
+.carril-tiempo {
+  display: grid;
+  grid-template-columns: minmax(130px, 0.3fr) minmax(300px, 1fr);
+  gap: 0.75rem;
+  align-items: center;
+  min-width: 480px;
+}
+
+.nombre-carril {
+  color: #496258;
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+
+.pista-tiempo {
+  position: relative;
+  min-height: 2.1rem;
+  border-bottom: 1px solid #b9cbbf;
+  background-image: linear-gradient(to right, #e8efea 1px, transparent 1px);
+  background-size: 25% 100%;
+}
+
+.barra-servicio {
+  position: absolute;
+  top: 0.35rem;
+  min-width: 2px;
+  height: 1.25rem;
+  overflow: hidden;
+  border-radius: 0.25rem;
+  background: #397c58;
+  color: #fff;
+  font-size: 0.65rem;
+  line-height: 1.25rem;
+  text-align: center;
+}
+
+.eje-tiempo {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.35rem 0 0 calc(min(30%, 142px) + 0.75rem);
+  color: #496258;
+  font-size: 0.75rem;
 }
 
 @media (prefers-reduced-motion: no-preference) {
