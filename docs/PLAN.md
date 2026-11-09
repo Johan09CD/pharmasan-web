@@ -1,6 +1,6 @@
 # Plan del proyecto
 
-- [ ] 1. Exportar datos
+- [x] 1. Exportar datos
 - [ ] 2. Implementar el motor
 - [ ] 3. Crear el modo observados
 - [ ] 4. Crear la escena 3D

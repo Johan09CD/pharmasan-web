@@ -13,3 +13,6 @@
   la última fase.
 - El archivo `.github/workflows/pages.yml` se mantiene como marcador sin
   configuración hasta la fase de despliegue.
+- `data/observados.json` se genera en `pharmasan-sim` desde el CSV procesado y
+  las tablas de análisis/escenarios existentes; la web consume ese artefacto
+  sin mantener una copia manual de las cifras.

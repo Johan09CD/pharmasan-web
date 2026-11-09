@@ -1,3 +1,2935 @@
 {
-  "estado": "pendiente de exportación"
+  "pacientes": [
+    {
+      "id": "Paciente 1",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 2,
+      "ventanilla": 1,
+      "inicio_min": 2,
+      "atencion_min": 6,
+      "espera_min": 0,
+      "salida_min": 8
+    },
+    {
+      "id": "Paciente 2",
+      "dia": "Lunes",
+      "tipo": "Preferencial",
+      "llegada_min": 3,
+      "ventanilla": 3,
+      "inicio_min": 3,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 8
+    },
+    {
+      "id": "Paciente 3",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 4,
+      "ventanilla": 2,
+      "inicio_min": 4,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 8
+    },
+    {
+      "id": "Paciente 4",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 6,
+      "ventanilla": 1,
+      "inicio_min": 8,
+      "atencion_min": 3,
+      "espera_min": 2,
+      "salida_min": 11
+    },
+    {
+      "id": "Paciente 5",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 9,
+      "ventanilla": 2,
+      "inicio_min": 9,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 14
+    },
+    {
+      "id": "Paciente 6",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 12,
+      "ventanilla": 1,
+      "inicio_min": 12,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 16
+    },
+    {
+      "id": "Paciente 7",
+      "dia": "Lunes",
+      "tipo": "Preferencial",
+      "llegada_min": 14,
+      "ventanilla": 3,
+      "inicio_min": 14,
+      "atencion_min": 6,
+      "espera_min": 0,
+      "salida_min": 20
+    },
+    {
+      "id": "Paciente 8",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 16,
+      "ventanilla": 2,
+      "inicio_min": 16,
+      "atencion_min": 6,
+      "espera_min": 0,
+      "salida_min": 22
+    },
+    {
+      "id": "Paciente 9",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 20,
+      "ventanilla": 1,
+      "inicio_min": 20,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 23
+    },
+    {
+      "id": "Paciente 10",
+      "dia": "Lunes",
+      "tipo": "Preferencial",
+      "llegada_min": 23,
+      "ventanilla": 3,
+      "inicio_min": 23,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 27
+    },
+    {
+      "id": "Paciente 11",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 24,
+      "ventanilla": 1,
+      "inicio_min": 24,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 28
+    },
+    {
+      "id": "Paciente 12",
+      "dia": "Lunes",
+      "tipo": "Preferencial",
+      "llegada_min": 27,
+      "ventanilla": 3,
+      "inicio_min": 27,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 31
+    },
+    {
+      "id": "Paciente 13",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 28,
+      "ventanilla": 2,
+      "inicio_min": 28,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 33
+    },
+    {
+      "id": "Paciente 14",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 32,
+      "ventanilla": 1,
+      "inicio_min": 32,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 36
+    },
+    {
+      "id": "Paciente 15",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 36,
+      "ventanilla": 2,
+      "inicio_min": 36,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 39
+    },
+    {
+      "id": "Paciente 16",
+      "dia": "Lunes",
+      "tipo": "Preferencial",
+      "llegada_min": 38,
+      "ventanilla": 3,
+      "inicio_min": 38,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 43
+    },
+    {
+      "id": "Paciente 17",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 41,
+      "ventanilla": 1,
+      "inicio_min": 41,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 46
+    },
+    {
+      "id": "Paciente 18",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 45,
+      "ventanilla": 2,
+      "inicio_min": 45,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 49
+    },
+    {
+      "id": "Paciente 19",
+      "dia": "Lunes",
+      "tipo": "Preferencial",
+      "llegada_min": 48,
+      "ventanilla": 3,
+      "inicio_min": 48,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 52
+    },
+    {
+      "id": "Paciente 20",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 50,
+      "ventanilla": 2,
+      "inicio_min": 50,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 53
+    },
+    {
+      "id": "Paciente 21",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 54,
+      "ventanilla": 1,
+      "inicio_min": 54,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 58
+    },
+    {
+      "id": "Paciente 22",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 58,
+      "ventanilla": 1,
+      "inicio_min": 58,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 63
+    },
+    {
+      "id": "Paciente 23",
+      "dia": "Lunes",
+      "tipo": "Preferencial",
+      "llegada_min": 59,
+      "ventanilla": 3,
+      "inicio_min": 59,
+      "atencion_min": 6,
+      "espera_min": 0,
+      "salida_min": 65
+    },
+    {
+      "id": "Paciente 24",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 62,
+      "ventanilla": 2,
+      "inicio_min": 62,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 67
+    },
+    {
+      "id": "Paciente 25",
+      "dia": "Lunes",
+      "tipo": "Preferencial",
+      "llegada_min": 63,
+      "ventanilla": 3,
+      "inicio_min": 65,
+      "atencion_min": 4,
+      "espera_min": 2,
+      "salida_min": 69
+    },
+    {
+      "id": "Paciente 26",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 66,
+      "ventanilla": 1,
+      "inicio_min": 66,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 70
+    },
+    {
+      "id": "Paciente 27",
+      "dia": "Lunes",
+      "tipo": "Preferencial",
+      "llegada_min": 67,
+      "ventanilla": 3,
+      "inicio_min": 69,
+      "atencion_min": 5,
+      "espera_min": 2,
+      "salida_min": 74
+    },
+    {
+      "id": "Paciente 28",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 70,
+      "ventanilla": 2,
+      "inicio_min": 70,
+      "atencion_min": 6,
+      "espera_min": 0,
+      "salida_min": 76
+    },
+    {
+      "id": "Paciente 29",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 75,
+      "ventanilla": 1,
+      "inicio_min": 75,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 78
+    },
+    {
+      "id": "Paciente 30",
+      "dia": "Lunes",
+      "tipo": "Preferencial",
+      "llegada_min": 76,
+      "ventanilla": 3,
+      "inicio_min": 76,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 81
+    },
+    {
+      "id": "Paciente 31",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 80,
+      "ventanilla": 1,
+      "inicio_min": 80,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 84
+    },
+    {
+      "id": "Paciente 32",
+      "dia": "Lunes",
+      "tipo": "Preferencial",
+      "llegada_min": 80,
+      "ventanilla": 3,
+      "inicio_min": 81,
+      "atencion_min": 5,
+      "espera_min": 1,
+      "salida_min": 86
+    },
+    {
+      "id": "Paciente 33",
+      "dia": "Lunes",
+      "tipo": "Preferencial",
+      "llegada_min": 83,
+      "ventanilla": 3,
+      "inicio_min": 86,
+      "atencion_min": 5,
+      "espera_min": 3,
+      "salida_min": 91
+    },
+    {
+      "id": "Paciente 34",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 85,
+      "ventanilla": 2,
+      "inicio_min": 85,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 90
+    },
+    {
+      "id": "Paciente 35",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 90,
+      "ventanilla": 1,
+      "inicio_min": 90,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 93
+    },
+    {
+      "id": "Paciente 36",
+      "dia": "Lunes",
+      "tipo": "Preferencial",
+      "llegada_min": 91,
+      "ventanilla": 3,
+      "inicio_min": 91,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 96
+    },
+    {
+      "id": "Paciente 37",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 95,
+      "ventanilla": 2,
+      "inicio_min": 95,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 99
+    },
+    {
+      "id": "Paciente 38",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 101,
+      "ventanilla": 1,
+      "inicio_min": 101,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 106
+    },
+    {
+      "id": "Paciente 39",
+      "dia": "Lunes",
+      "tipo": "Preferencial",
+      "llegada_min": 101,
+      "ventanilla": 3,
+      "inicio_min": 101,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 105
+    },
+    {
+      "id": "Paciente 40",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 107,
+      "ventanilla": 2,
+      "inicio_min": 107,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 110
+    },
+    {
+      "id": "Paciente 41",
+      "dia": "Lunes",
+      "tipo": "Preferencial",
+      "llegada_min": 110,
+      "ventanilla": 3,
+      "inicio_min": 110,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 115
+    },
+    {
+      "id": "Paciente 42",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 112,
+      "ventanilla": 1,
+      "inicio_min": 112,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 116
+    },
+    {
+      "id": "Paciente 43",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 117,
+      "ventanilla": 2,
+      "inicio_min": 117,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 121
+    },
+    {
+      "id": "Paciente 44",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 125,
+      "ventanilla": 1,
+      "inicio_min": 125,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 129
+    },
+    {
+      "id": "Paciente 45",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 132,
+      "ventanilla": 2,
+      "inicio_min": 132,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 137
+    },
+    {
+      "id": "Paciente 46",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 140,
+      "ventanilla": 1,
+      "inicio_min": 140,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 143
+    },
+    {
+      "id": "Paciente 47",
+      "dia": "Lunes",
+      "tipo": "General",
+      "llegada_min": 148,
+      "ventanilla": 2,
+      "inicio_min": 148,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 152
+    },
+    {
+      "id": "Paciente 48",
+      "dia": "Martes",
+      "tipo": "Preferencial",
+      "llegada_min": 3,
+      "ventanilla": 3,
+      "inicio_min": 3,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 8
+    },
+    {
+      "id": "Paciente 49",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 4,
+      "ventanilla": 1,
+      "inicio_min": 4,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 9
+    },
+    {
+      "id": "Paciente 50",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 6,
+      "ventanilla": 2,
+      "inicio_min": 6,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 10
+    },
+    {
+      "id": "Paciente 51",
+      "dia": "Martes",
+      "tipo": "Preferencial",
+      "llegada_min": 7,
+      "ventanilla": 3,
+      "inicio_min": 8,
+      "atencion_min": 4,
+      "espera_min": 1,
+      "salida_min": 12
+    },
+    {
+      "id": "Paciente 52",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 8,
+      "ventanilla": 2,
+      "inicio_min": 10,
+      "atencion_min": 3,
+      "espera_min": 2,
+      "salida_min": 13
+    },
+    {
+      "id": "Paciente 53",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 12,
+      "ventanilla": 1,
+      "inicio_min": 12,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 16
+    },
+    {
+      "id": "Paciente 54",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 16,
+      "ventanilla": 2,
+      "inicio_min": 16,
+      "atencion_min": 6,
+      "espera_min": 0,
+      "salida_min": 22
+    },
+    {
+      "id": "Paciente 55",
+      "dia": "Martes",
+      "tipo": "Preferencial",
+      "llegada_min": 18,
+      "ventanilla": 3,
+      "inicio_min": 18,
+      "atencion_min": 7,
+      "espera_min": 0,
+      "salida_min": 25
+    },
+    {
+      "id": "Paciente 56",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 20,
+      "ventanilla": 1,
+      "inicio_min": 20,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 23
+    },
+    {
+      "id": "Paciente 57",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 25,
+      "ventanilla": 1,
+      "inicio_min": 25,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 29
+    },
+    {
+      "id": "Paciente 58",
+      "dia": "Martes",
+      "tipo": "Preferencial",
+      "llegada_min": 28,
+      "ventanilla": 3,
+      "inicio_min": 28,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 33
+    },
+    {
+      "id": "Paciente 59",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 30,
+      "ventanilla": 2,
+      "inicio_min": 30,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 35
+    },
+    {
+      "id": "Paciente 60",
+      "dia": "Martes",
+      "tipo": "Preferencial",
+      "llegada_min": 31,
+      "ventanilla": 3,
+      "inicio_min": 33,
+      "atencion_min": 6,
+      "espera_min": 2,
+      "salida_min": 39
+    },
+    {
+      "id": "Paciente 61",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 35,
+      "ventanilla": 1,
+      "inicio_min": 35,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 38
+    },
+    {
+      "id": "Paciente 62",
+      "dia": "Martes",
+      "tipo": "Preferencial",
+      "llegada_min": 39,
+      "ventanilla": 3,
+      "inicio_min": 39,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 43
+    },
+    {
+      "id": "Paciente 63",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 40,
+      "ventanilla": 2,
+      "inicio_min": 40,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 44
+    },
+    {
+      "id": "Paciente 64",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 45,
+      "ventanilla": 1,
+      "inicio_min": 45,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 50
+    },
+    {
+      "id": "Paciente 65",
+      "dia": "Martes",
+      "tipo": "Preferencial",
+      "llegada_min": 47,
+      "ventanilla": 3,
+      "inicio_min": 47,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 51
+    },
+    {
+      "id": "Paciente 66",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 50,
+      "ventanilla": 2,
+      "inicio_min": 50,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 53
+    },
+    {
+      "id": "Paciente 67",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 55,
+      "ventanilla": 1,
+      "inicio_min": 55,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 59
+    },
+    {
+      "id": "Paciente 68",
+      "dia": "Martes",
+      "tipo": "Preferencial",
+      "llegada_min": 58,
+      "ventanilla": 3,
+      "inicio_min": 58,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 63
+    },
+    {
+      "id": "Paciente 69",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 62,
+      "ventanilla": 2,
+      "inicio_min": 62,
+      "atencion_min": 6,
+      "espera_min": 0,
+      "salida_min": 68
+    },
+    {
+      "id": "Paciente 70",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 66,
+      "ventanilla": 1,
+      "inicio_min": 66,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 70
+    },
+    {
+      "id": "Paciente 71",
+      "dia": "Martes",
+      "tipo": "Preferencial",
+      "llegada_min": 67,
+      "ventanilla": 3,
+      "inicio_min": 67,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 72
+    },
+    {
+      "id": "Paciente 72",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 71,
+      "ventanilla": 1,
+      "inicio_min": 71,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 74
+    },
+    {
+      "id": "Paciente 73",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 76,
+      "ventanilla": 2,
+      "inicio_min": 76,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 81
+    },
+    {
+      "id": "Paciente 74",
+      "dia": "Martes",
+      "tipo": "Preferencial",
+      "llegada_min": 76,
+      "ventanilla": 3,
+      "inicio_min": 76,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 81
+    },
+    {
+      "id": "Paciente 75",
+      "dia": "Martes",
+      "tipo": "Preferencial",
+      "llegada_min": 80,
+      "ventanilla": 3,
+      "inicio_min": 81,
+      "atencion_min": 7,
+      "espera_min": 1,
+      "salida_min": 88
+    },
+    {
+      "id": "Paciente 76",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 82,
+      "ventanilla": 1,
+      "inicio_min": 82,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 86
+    },
+    {
+      "id": "Paciente 77",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 88,
+      "ventanilla": 2,
+      "inicio_min": 88,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 91
+    },
+    {
+      "id": "Paciente 78",
+      "dia": "Martes",
+      "tipo": "Preferencial",
+      "llegada_min": 90,
+      "ventanilla": 3,
+      "inicio_min": 90,
+      "atencion_min": 7,
+      "espera_min": 0,
+      "salida_min": 97
+    },
+    {
+      "id": "Paciente 79",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 94,
+      "ventanilla": 1,
+      "inicio_min": 94,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 98
+    },
+    {
+      "id": "Paciente 80",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 100,
+      "ventanilla": 2,
+      "inicio_min": 100,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 105
+    },
+    {
+      "id": "Paciente 81",
+      "dia": "Martes",
+      "tipo": "Preferencial",
+      "llegada_min": 101,
+      "ventanilla": 3,
+      "inicio_min": 101,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 106
+    },
+    {
+      "id": "Paciente 82",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 106,
+      "ventanilla": 1,
+      "inicio_min": 106,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 109
+    },
+    {
+      "id": "Paciente 83",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 112,
+      "ventanilla": 2,
+      "inicio_min": 112,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 116
+    },
+    {
+      "id": "Paciente 84",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 117,
+      "ventanilla": 1,
+      "inicio_min": 117,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 120
+    },
+    {
+      "id": "Paciente 85",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 125,
+      "ventanilla": 2,
+      "inicio_min": 125,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 129
+    },
+    {
+      "id": "Paciente 86",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 133,
+      "ventanilla": 1,
+      "inicio_min": 133,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 138
+    },
+    {
+      "id": "Paciente 87",
+      "dia": "Martes",
+      "tipo": "General",
+      "llegada_min": 142,
+      "ventanilla": 2,
+      "inicio_min": 142,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 145
+    },
+    {
+      "id": "Paciente 88",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 2,
+      "ventanilla": 1,
+      "inicio_min": 2,
+      "atencion_min": 6,
+      "espera_min": 0,
+      "salida_min": 8
+    },
+    {
+      "id": "Paciente 89",
+      "dia": "Viernes",
+      "tipo": "Preferencial",
+      "llegada_min": 3,
+      "ventanilla": 3,
+      "inicio_min": 3,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 7
+    },
+    {
+      "id": "Paciente 90",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 5,
+      "ventanilla": 2,
+      "inicio_min": 5,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 10
+    },
+    {
+      "id": "Paciente 91",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 7,
+      "ventanilla": 1,
+      "inicio_min": 8,
+      "atencion_min": 4,
+      "espera_min": 1,
+      "salida_min": 12
+    },
+    {
+      "id": "Paciente 92",
+      "dia": "Viernes",
+      "tipo": "Preferencial",
+      "llegada_min": 7,
+      "ventanilla": 3,
+      "inicio_min": 7,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 11
+    },
+    {
+      "id": "Paciente 93",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 10,
+      "ventanilla": 2,
+      "inicio_min": 10,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 13
+    },
+    {
+      "id": "Paciente 94",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 14,
+      "ventanilla": 1,
+      "inicio_min": 14,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 18
+    },
+    {
+      "id": "Paciente 95",
+      "dia": "Viernes",
+      "tipo": "Preferencial",
+      "llegada_min": 15,
+      "ventanilla": 3,
+      "inicio_min": 15,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 20
+    },
+    {
+      "id": "Paciente 96",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 18,
+      "ventanilla": 2,
+      "inicio_min": 18,
+      "atencion_min": 6,
+      "espera_min": 0,
+      "salida_min": 24
+    },
+    {
+      "id": "Paciente 97",
+      "dia": "Viernes",
+      "tipo": "Preferencial",
+      "llegada_min": 19,
+      "ventanilla": 3,
+      "inicio_min": 20,
+      "atencion_min": 6,
+      "espera_min": 1,
+      "salida_min": 26
+    },
+    {
+      "id": "Paciente 98",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 22,
+      "ventanilla": 1,
+      "inicio_min": 22,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 25
+    },
+    {
+      "id": "Paciente 99",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 26,
+      "ventanilla": 1,
+      "inicio_min": 26,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 30
+    },
+    {
+      "id": "Paciente 100",
+      "dia": "Viernes",
+      "tipo": "Preferencial",
+      "llegada_min": 27,
+      "ventanilla": 3,
+      "inicio_min": 27,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 32
+    },
+    {
+      "id": "Paciente 101",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 30,
+      "ventanilla": 2,
+      "inicio_min": 30,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 35
+    },
+    {
+      "id": "Paciente 102",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 34,
+      "ventanilla": 1,
+      "inicio_min": 34,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 38
+    },
+    {
+      "id": "Paciente 103",
+      "dia": "Viernes",
+      "tipo": "Preferencial",
+      "llegada_min": 36,
+      "ventanilla": 3,
+      "inicio_min": 36,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 40
+    },
+    {
+      "id": "Paciente 104",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 38,
+      "ventanilla": 2,
+      "inicio_min": 38,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 41
+    },
+    {
+      "id": "Paciente 105",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 42,
+      "ventanilla": 1,
+      "inicio_min": 42,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 47
+    },
+    {
+      "id": "Paciente 106",
+      "dia": "Viernes",
+      "tipo": "Preferencial",
+      "llegada_min": 46,
+      "ventanilla": 3,
+      "inicio_min": 46,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 50
+    },
+    {
+      "id": "Paciente 107",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 47,
+      "ventanilla": 2,
+      "inicio_min": 47,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 51
+    },
+    {
+      "id": "Paciente 108",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 51,
+      "ventanilla": 1,
+      "inicio_min": 51,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 54
+    },
+    {
+      "id": "Paciente 109",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 55,
+      "ventanilla": 2,
+      "inicio_min": 55,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 59
+    },
+    {
+      "id": "Paciente 110",
+      "dia": "Viernes",
+      "tipo": "Preferencial",
+      "llegada_min": 57,
+      "ventanilla": 3,
+      "inicio_min": 57,
+      "atencion_min": 6,
+      "espera_min": 0,
+      "salida_min": 63
+    },
+    {
+      "id": "Paciente 111",
+      "dia": "Viernes",
+      "tipo": "Preferencial",
+      "llegada_min": 61,
+      "ventanilla": 3,
+      "inicio_min": 63,
+      "atencion_min": 4,
+      "espera_min": 2,
+      "salida_min": 67
+    },
+    {
+      "id": "Paciente 112",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 62,
+      "ventanilla": 1,
+      "inicio_min": 62,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 67
+    },
+    {
+      "id": "Paciente 113",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 66,
+      "ventanilla": 2,
+      "inicio_min": 66,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 70
+    },
+    {
+      "id": "Paciente 114",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 71,
+      "ventanilla": 1,
+      "inicio_min": 71,
+      "atencion_min": 6,
+      "espera_min": 0,
+      "salida_min": 77
+    },
+    {
+      "id": "Paciente 115",
+      "dia": "Viernes",
+      "tipo": "Preferencial",
+      "llegada_min": 71,
+      "ventanilla": 3,
+      "inicio_min": 71,
+      "atencion_min": 6,
+      "espera_min": 0,
+      "salida_min": 77
+    },
+    {
+      "id": "Paciente 116",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 76,
+      "ventanilla": 2,
+      "inicio_min": 76,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 79
+    },
+    {
+      "id": "Paciente 117",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 81,
+      "ventanilla": 1,
+      "inicio_min": 81,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 85
+    },
+    {
+      "id": "Paciente 118",
+      "dia": "Viernes",
+      "tipo": "Preferencial",
+      "llegada_min": 81,
+      "ventanilla": 3,
+      "inicio_min": 81,
+      "atencion_min": 6,
+      "espera_min": 0,
+      "salida_min": 87
+    },
+    {
+      "id": "Paciente 119",
+      "dia": "Viernes",
+      "tipo": "Preferencial",
+      "llegada_min": 84,
+      "ventanilla": 3,
+      "inicio_min": 87,
+      "atencion_min": 5,
+      "espera_min": 3,
+      "salida_min": 92
+    },
+    {
+      "id": "Paciente 120",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 86,
+      "ventanilla": 2,
+      "inicio_min": 86,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 91
+    },
+    {
+      "id": "Paciente 121",
+      "dia": "Viernes",
+      "tipo": "Preferencial",
+      "llegada_min": 87,
+      "ventanilla": 3,
+      "inicio_min": 92,
+      "atencion_min": 6,
+      "espera_min": 5,
+      "salida_min": 98
+    },
+    {
+      "id": "Paciente 122",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 91,
+      "ventanilla": 1,
+      "inicio_min": 91,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 94
+    },
+    {
+      "id": "Paciente 123",
+      "dia": "Viernes",
+      "tipo": "Preferencial",
+      "llegada_min": 96,
+      "ventanilla": 3,
+      "inicio_min": 98,
+      "atencion_min": 5,
+      "espera_min": 2,
+      "salida_min": 103
+    },
+    {
+      "id": "Paciente 124",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 97,
+      "ventanilla": 2,
+      "inicio_min": 97,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 101
+    },
+    {
+      "id": "Paciente 125",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 103,
+      "ventanilla": 1,
+      "inicio_min": 103,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 108
+    },
+    {
+      "id": "Paciente 126",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 109,
+      "ventanilla": 2,
+      "inicio_min": 109,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 112
+    },
+    {
+      "id": "Paciente 127",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 114,
+      "ventanilla": 1,
+      "inicio_min": 114,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 118
+    },
+    {
+      "id": "Paciente 128",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 118,
+      "ventanilla": 2,
+      "inicio_min": 118,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 121
+    },
+    {
+      "id": "Paciente 129",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 126,
+      "ventanilla": 1,
+      "inicio_min": 126,
+      "atencion_min": 4,
+      "espera_min": 0,
+      "salida_min": 130
+    },
+    {
+      "id": "Paciente 130",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 134,
+      "ventanilla": 2,
+      "inicio_min": 134,
+      "atencion_min": 5,
+      "espera_min": 0,
+      "salida_min": 139
+    },
+    {
+      "id": "Paciente 131",
+      "dia": "Viernes",
+      "tipo": "General",
+      "llegada_min": 143,
+      "ventanilla": 1,
+      "inicio_min": 143,
+      "atencion_min": 3,
+      "espera_min": 0,
+      "salida_min": 146
+    }
+  ],
+  "pico": [
+    "Paciente 1",
+    "Paciente 2",
+    "Paciente 3",
+    "Paciente 4",
+    "Paciente 5",
+    "Paciente 6",
+    "Paciente 7",
+    "Paciente 8",
+    "Paciente 9",
+    "Paciente 10",
+    "Paciente 11",
+    "Paciente 12",
+    "Paciente 13",
+    "Paciente 14",
+    "Paciente 15",
+    "Paciente 16",
+    "Paciente 17",
+    "Paciente 18",
+    "Paciente 19",
+    "Paciente 20",
+    "Paciente 21",
+    "Paciente 22",
+    "Paciente 23",
+    "Paciente 24",
+    "Paciente 48",
+    "Paciente 49",
+    "Paciente 50",
+    "Paciente 51",
+    "Paciente 52",
+    "Paciente 53",
+    "Paciente 54",
+    "Paciente 55",
+    "Paciente 56",
+    "Paciente 57",
+    "Paciente 58",
+    "Paciente 59",
+    "Paciente 60",
+    "Paciente 61",
+    "Paciente 62",
+    "Paciente 63",
+    "Paciente 64",
+    "Paciente 65",
+    "Paciente 66",
+    "Paciente 67",
+    "Paciente 68",
+    "Paciente 69",
+    "Paciente 88",
+    "Paciente 89",
+    "Paciente 90",
+    "Paciente 91",
+    "Paciente 92",
+    "Paciente 93",
+    "Paciente 94",
+    "Paciente 95",
+    "Paciente 96",
+    "Paciente 97",
+    "Paciente 98",
+    "Paciente 99",
+    "Paciente 100",
+    "Paciente 101",
+    "Paciente 102",
+    "Paciente 103",
+    "Paciente 104",
+    "Paciente 105",
+    "Paciente 106",
+    "Paciente 107",
+    "Paciente 108",
+    "Paciente 109",
+    "Paciente 110",
+    "Paciente 111",
+    "Paciente 112"
+  ],
+  "atencion": {
+    "General": {
+      "media_min": 4.123595505617978,
+      "desviacion_min": 0.9392964572088118,
+      "cv": 0.2277857893503658,
+      "valores_observados_min": [
+        6,
+        4,
+        3,
+        5,
+        4,
+        6,
+        3,
+        4,
+        5,
+        4,
+        3,
+        5,
+        4,
+        3,
+        4,
+        5,
+        5,
+        4,
+        6,
+        3,
+        4,
+        5,
+        3,
+        4,
+        5,
+        3,
+        4,
+        4,
+        4,
+        5,
+        3,
+        4,
+        5,
+        4,
+        3,
+        4,
+        6,
+        3,
+        4,
+        5,
+        3,
+        4,
+        5,
+        3,
+        4,
+        6,
+        4,
+        3,
+        5,
+        4,
+        3,
+        4,
+        5,
+        3,
+        4,
+        3,
+        4,
+        5,
+        3,
+        6,
+        5,
+        4,
+        3,
+        4,
+        6,
+        3,
+        4,
+        5,
+        4,
+        3,
+        5,
+        4,
+        3,
+        4,
+        5,
+        4,
+        6,
+        3,
+        4,
+        5,
+        3,
+        4,
+        5,
+        3,
+        4,
+        3,
+        4,
+        5,
+        3
+      ],
+      "erlang": {
+        "forma": 22,
+        "tasa": 5.33396
+      }
+    },
+    "Preferencial": {
+      "media_min": 5.023809523809524,
+      "desviacion_min": 0.8968262533442989,
+      "cv": 0.1785151783908083,
+      "valores_observados_min": [
+        5,
+        6,
+        4,
+        4,
+        5,
+        4,
+        6,
+        4,
+        5,
+        5,
+        5,
+        5,
+        5,
+        4,
+        5,
+        5,
+        4,
+        7,
+        5,
+        6,
+        4,
+        4,
+        5,
+        5,
+        5,
+        7,
+        7,
+        5,
+        4,
+        4,
+        5,
+        6,
+        5,
+        4,
+        4,
+        6,
+        4,
+        6,
+        6,
+        5,
+        6,
+        5
+      ],
+      "erlang": {
+        "forma": 37,
+        "tasa": 7.36341
+      }
+    }
+  },
+  "llegadas": {
+    "conteos_5_min": [
+      {
+        "dia": "Lunes",
+        "tipo": "General",
+        "intervalo": 1,
+        "inicio_min": 2,
+        "fin_min": 7,
+        "etiqueta": "08:02-08:07",
+        "llegadas": 3
+      },
+      {
+        "dia": "Lunes",
+        "tipo": "General",
+        "intervalo": 2,
+        "inicio_min": 7,
+        "fin_min": 12,
+        "etiqueta": "08:07-08:12",
+        "llegadas": 1
+      },
+      {
+        "dia": "Lunes",
+        "tipo": "General",
+        "intervalo": 3,
+        "inicio_min": 12,
+        "fin_min": 17,
+        "etiqueta": "08:12-08:17",
+        "llegadas": 2
+      },
+      {
+        "dia": "Lunes",
+        "tipo": "General",
+        "intervalo": 4,
+        "inicio_min": 17,
+        "fin_min": 22,
+        "etiqueta": "08:17-08:22",
+        "llegadas": 1
+      },
+      {
+        "dia": "Lunes",
+        "tipo": "General",
+        "intervalo": 5,
+        "inicio_min": 22,
+        "fin_min": 27,
+        "etiqueta": "08:22-08:27",
+        "llegadas": 1
+      },
+      {
+        "dia": "Lunes",
+        "tipo": "General",
+        "intervalo": 6,
+        "inicio_min": 27,
+        "fin_min": 32,
+        "etiqueta": "08:27-08:32",
+        "llegadas": 1
+      },
+      {
+        "dia": "Lunes",
+        "tipo": "General",
+        "intervalo": 7,
+        "inicio_min": 32,
+        "fin_min": 37,
+        "etiqueta": "08:32-08:37",
+        "llegadas": 2
+      },
+      {
+        "dia": "Lunes",
+        "tipo": "General",
+        "intervalo": 8,
+        "inicio_min": 37,
+        "fin_min": 42,
+        "etiqueta": "08:37-08:42",
+        "llegadas": 1
+      },
+      {
+        "dia": "Lunes",
+        "tipo": "General",
+        "intervalo": 9,
+        "inicio_min": 42,
+        "fin_min": 47,
+        "etiqueta": "08:42-08:47",
+        "llegadas": 1
+      },
+      {
+        "dia": "Lunes",
+        "tipo": "General",
+        "intervalo": 10,
+        "inicio_min": 47,
+        "fin_min": 52,
+        "etiqueta": "08:47-08:52",
+        "llegadas": 1
+      },
+      {
+        "dia": "Lunes",
+        "tipo": "General",
+        "intervalo": 11,
+        "inicio_min": 52,
+        "fin_min": 57,
+        "etiqueta": "08:52-08:57",
+        "llegadas": 1
+      },
+      {
+        "dia": "Lunes",
+        "tipo": "General",
+        "intervalo": 12,
+        "inicio_min": 57,
+        "fin_min": 62,
+        "etiqueta": "08:57-09:02",
+        "llegadas": 2
+      },
+      {
+        "dia": "Lunes",
+        "tipo": "Preferencial",
+        "intervalo": 1,
+        "inicio_min": 2,
+        "fin_min": 7,
+        "etiqueta": "08:02-08:07",
+        "llegadas": 1
+      },
+      {
+        "dia": "Lunes",
+        "tipo": "Preferencial",
+        "intervalo": 2,
+        "inicio_min": 7,
+        "fin_min": 12,
+        "etiqueta": "08:07-08:12",
+        "llegadas": 0
+      },
+      {
+        "dia": "Lunes",
+        "tipo": "Preferencial",
+        "intervalo": 3,
+        "inicio_min": 12,
+        "fin_min": 17,
+        "etiqueta": "08:12-08:17",
+        "llegadas": 1
+      },
+      {
+        "dia": "Lunes",
+        "tipo": "Preferencial",
+        "intervalo": 4,
+        "inicio_min": 17,
+        "fin_min": 22,
+        "etiqueta": "08:17-08:22",
+        "llegadas": 0
+      },
+      {
+        "dia": "Lunes",
+        "tipo": "Preferencial",
+        "intervalo": 5,
+        "inicio_min": 22,
+        "fin_min": 27,
+        "etiqueta": "08:22-08:27",
+        "llegadas": 1
+      },
+      {
+        "dia": "Lunes",
+        "tipo": "Preferencial",
+        "intervalo": 6,
+        "inicio_min": 27,
+        "fin_min": 32,
+        "etiqueta": "08:27-08:32",
+        "llegadas": 1
+      },
+      {
+        "dia": "Lunes",
+        "tipo": "Preferencial",
+        "intervalo": 7,
+        "inicio_min": 32,
+        "fin_min": 37,
+        "etiqueta": "08:32-08:37",
+        "llegadas": 0
+      },
+      {
+        "dia": "Lunes",
+        "tipo": "Preferencial",
+        "intervalo": 8,
+        "inicio_min": 37,
+        "fin_min": 42,
+        "etiqueta": "08:37-08:42",
+        "llegadas": 1
+      },
+      {
+        "dia": "Lunes",
+        "tipo": "Preferencial",
+        "intervalo": 9,
+        "inicio_min": 42,
+        "fin_min": 47,
+        "etiqueta": "08:42-08:47",
+        "llegadas": 0
+      },
+      {
+        "dia": "Lunes",
+        "tipo": "Preferencial",
+        "intervalo": 10,
+        "inicio_min": 47,
+        "fin_min": 52,
+        "etiqueta": "08:47-08:52",
+        "llegadas": 1
+      },
+      {
+        "dia": "Lunes",
+        "tipo": "Preferencial",
+        "intervalo": 11,
+        "inicio_min": 52,
+        "fin_min": 57,
+        "etiqueta": "08:52-08:57",
+        "llegadas": 0
+      },
+      {
+        "dia": "Lunes",
+        "tipo": "Preferencial",
+        "intervalo": 12,
+        "inicio_min": 57,
+        "fin_min": 62,
+        "etiqueta": "08:57-09:02",
+        "llegadas": 1
+      },
+      {
+        "dia": "Martes",
+        "tipo": "General",
+        "intervalo": 1,
+        "inicio_min": 2,
+        "fin_min": 7,
+        "etiqueta": "08:02-08:07",
+        "llegadas": 2
+      },
+      {
+        "dia": "Martes",
+        "tipo": "General",
+        "intervalo": 2,
+        "inicio_min": 7,
+        "fin_min": 12,
+        "etiqueta": "08:07-08:12",
+        "llegadas": 1
+      },
+      {
+        "dia": "Martes",
+        "tipo": "General",
+        "intervalo": 3,
+        "inicio_min": 12,
+        "fin_min": 17,
+        "etiqueta": "08:12-08:17",
+        "llegadas": 2
+      },
+      {
+        "dia": "Martes",
+        "tipo": "General",
+        "intervalo": 4,
+        "inicio_min": 17,
+        "fin_min": 22,
+        "etiqueta": "08:17-08:22",
+        "llegadas": 1
+      },
+      {
+        "dia": "Martes",
+        "tipo": "General",
+        "intervalo": 5,
+        "inicio_min": 22,
+        "fin_min": 27,
+        "etiqueta": "08:22-08:27",
+        "llegadas": 1
+      },
+      {
+        "dia": "Martes",
+        "tipo": "General",
+        "intervalo": 6,
+        "inicio_min": 27,
+        "fin_min": 32,
+        "etiqueta": "08:27-08:32",
+        "llegadas": 1
+      },
+      {
+        "dia": "Martes",
+        "tipo": "General",
+        "intervalo": 7,
+        "inicio_min": 32,
+        "fin_min": 37,
+        "etiqueta": "08:32-08:37",
+        "llegadas": 1
+      },
+      {
+        "dia": "Martes",
+        "tipo": "General",
+        "intervalo": 8,
+        "inicio_min": 37,
+        "fin_min": 42,
+        "etiqueta": "08:37-08:42",
+        "llegadas": 1
+      },
+      {
+        "dia": "Martes",
+        "tipo": "General",
+        "intervalo": 9,
+        "inicio_min": 42,
+        "fin_min": 47,
+        "etiqueta": "08:42-08:47",
+        "llegadas": 1
+      },
+      {
+        "dia": "Martes",
+        "tipo": "General",
+        "intervalo": 10,
+        "inicio_min": 47,
+        "fin_min": 52,
+        "etiqueta": "08:47-08:52",
+        "llegadas": 1
+      },
+      {
+        "dia": "Martes",
+        "tipo": "General",
+        "intervalo": 11,
+        "inicio_min": 52,
+        "fin_min": 57,
+        "etiqueta": "08:52-08:57",
+        "llegadas": 1
+      },
+      {
+        "dia": "Martes",
+        "tipo": "General",
+        "intervalo": 12,
+        "inicio_min": 57,
+        "fin_min": 62,
+        "etiqueta": "08:57-09:02",
+        "llegadas": 1
+      },
+      {
+        "dia": "Martes",
+        "tipo": "Preferencial",
+        "intervalo": 1,
+        "inicio_min": 2,
+        "fin_min": 7,
+        "etiqueta": "08:02-08:07",
+        "llegadas": 1
+      },
+      {
+        "dia": "Martes",
+        "tipo": "Preferencial",
+        "intervalo": 2,
+        "inicio_min": 7,
+        "fin_min": 12,
+        "etiqueta": "08:07-08:12",
+        "llegadas": 1
+      },
+      {
+        "dia": "Martes",
+        "tipo": "Preferencial",
+        "intervalo": 3,
+        "inicio_min": 12,
+        "fin_min": 17,
+        "etiqueta": "08:12-08:17",
+        "llegadas": 0
+      },
+      {
+        "dia": "Martes",
+        "tipo": "Preferencial",
+        "intervalo": 4,
+        "inicio_min": 17,
+        "fin_min": 22,
+        "etiqueta": "08:17-08:22",
+        "llegadas": 1
+      },
+      {
+        "dia": "Martes",
+        "tipo": "Preferencial",
+        "intervalo": 5,
+        "inicio_min": 22,
+        "fin_min": 27,
+        "etiqueta": "08:22-08:27",
+        "llegadas": 0
+      },
+      {
+        "dia": "Martes",
+        "tipo": "Preferencial",
+        "intervalo": 6,
+        "inicio_min": 27,
+        "fin_min": 32,
+        "etiqueta": "08:27-08:32",
+        "llegadas": 2
+      },
+      {
+        "dia": "Martes",
+        "tipo": "Preferencial",
+        "intervalo": 7,
+        "inicio_min": 32,
+        "fin_min": 37,
+        "etiqueta": "08:32-08:37",
+        "llegadas": 0
+      },
+      {
+        "dia": "Martes",
+        "tipo": "Preferencial",
+        "intervalo": 8,
+        "inicio_min": 37,
+        "fin_min": 42,
+        "etiqueta": "08:37-08:42",
+        "llegadas": 1
+      },
+      {
+        "dia": "Martes",
+        "tipo": "Preferencial",
+        "intervalo": 9,
+        "inicio_min": 42,
+        "fin_min": 47,
+        "etiqueta": "08:42-08:47",
+        "llegadas": 0
+      },
+      {
+        "dia": "Martes",
+        "tipo": "Preferencial",
+        "intervalo": 10,
+        "inicio_min": 47,
+        "fin_min": 52,
+        "etiqueta": "08:47-08:52",
+        "llegadas": 1
+      },
+      {
+        "dia": "Martes",
+        "tipo": "Preferencial",
+        "intervalo": 11,
+        "inicio_min": 52,
+        "fin_min": 57,
+        "etiqueta": "08:52-08:57",
+        "llegadas": 0
+      },
+      {
+        "dia": "Martes",
+        "tipo": "Preferencial",
+        "intervalo": 12,
+        "inicio_min": 57,
+        "fin_min": 62,
+        "etiqueta": "08:57-09:02",
+        "llegadas": 1
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "General",
+        "intervalo": 1,
+        "inicio_min": 2,
+        "fin_min": 7,
+        "etiqueta": "08:02-08:07",
+        "llegadas": 2
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "General",
+        "intervalo": 2,
+        "inicio_min": 7,
+        "fin_min": 12,
+        "etiqueta": "08:07-08:12",
+        "llegadas": 2
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "General",
+        "intervalo": 3,
+        "inicio_min": 12,
+        "fin_min": 17,
+        "etiqueta": "08:12-08:17",
+        "llegadas": 1
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "General",
+        "intervalo": 4,
+        "inicio_min": 17,
+        "fin_min": 22,
+        "etiqueta": "08:17-08:22",
+        "llegadas": 1
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "General",
+        "intervalo": 5,
+        "inicio_min": 22,
+        "fin_min": 27,
+        "etiqueta": "08:22-08:27",
+        "llegadas": 2
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "General",
+        "intervalo": 6,
+        "inicio_min": 27,
+        "fin_min": 32,
+        "etiqueta": "08:27-08:32",
+        "llegadas": 1
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "General",
+        "intervalo": 7,
+        "inicio_min": 32,
+        "fin_min": 37,
+        "etiqueta": "08:32-08:37",
+        "llegadas": 1
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "General",
+        "intervalo": 8,
+        "inicio_min": 37,
+        "fin_min": 42,
+        "etiqueta": "08:37-08:42",
+        "llegadas": 1
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "General",
+        "intervalo": 9,
+        "inicio_min": 42,
+        "fin_min": 47,
+        "etiqueta": "08:42-08:47",
+        "llegadas": 1
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "General",
+        "intervalo": 10,
+        "inicio_min": 47,
+        "fin_min": 52,
+        "etiqueta": "08:47-08:52",
+        "llegadas": 2
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "General",
+        "intervalo": 11,
+        "inicio_min": 52,
+        "fin_min": 57,
+        "etiqueta": "08:52-08:57",
+        "llegadas": 1
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "General",
+        "intervalo": 12,
+        "inicio_min": 57,
+        "fin_min": 62,
+        "etiqueta": "08:57-09:02",
+        "llegadas": 1
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "Preferencial",
+        "intervalo": 1,
+        "inicio_min": 2,
+        "fin_min": 7,
+        "etiqueta": "08:02-08:07",
+        "llegadas": 1
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "Preferencial",
+        "intervalo": 2,
+        "inicio_min": 7,
+        "fin_min": 12,
+        "etiqueta": "08:07-08:12",
+        "llegadas": 1
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "Preferencial",
+        "intervalo": 3,
+        "inicio_min": 12,
+        "fin_min": 17,
+        "etiqueta": "08:12-08:17",
+        "llegadas": 1
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "Preferencial",
+        "intervalo": 4,
+        "inicio_min": 17,
+        "fin_min": 22,
+        "etiqueta": "08:17-08:22",
+        "llegadas": 1
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "Preferencial",
+        "intervalo": 5,
+        "inicio_min": 22,
+        "fin_min": 27,
+        "etiqueta": "08:22-08:27",
+        "llegadas": 0
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "Preferencial",
+        "intervalo": 6,
+        "inicio_min": 27,
+        "fin_min": 32,
+        "etiqueta": "08:27-08:32",
+        "llegadas": 1
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "Preferencial",
+        "intervalo": 7,
+        "inicio_min": 32,
+        "fin_min": 37,
+        "etiqueta": "08:32-08:37",
+        "llegadas": 1
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "Preferencial",
+        "intervalo": 8,
+        "inicio_min": 37,
+        "fin_min": 42,
+        "etiqueta": "08:37-08:42",
+        "llegadas": 0
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "Preferencial",
+        "intervalo": 9,
+        "inicio_min": 42,
+        "fin_min": 47,
+        "etiqueta": "08:42-08:47",
+        "llegadas": 1
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "Preferencial",
+        "intervalo": 10,
+        "inicio_min": 47,
+        "fin_min": 52,
+        "etiqueta": "08:47-08:52",
+        "llegadas": 0
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "Preferencial",
+        "intervalo": 11,
+        "inicio_min": 52,
+        "fin_min": 57,
+        "etiqueta": "08:52-08:57",
+        "llegadas": 0
+      },
+      {
+        "dia": "Viernes",
+        "tipo": "Preferencial",
+        "intervalo": 12,
+        "inicio_min": 57,
+        "fin_min": 62,
+        "etiqueta": "08:57-09:02",
+        "llegadas": 2
+      }
+    ],
+    "tiempos_entre_llegadas_pico": [
+      {
+        "dia": "Lunes",
+        "llegada_anterior_min": 2,
+        "llegada_min": 3,
+        "intervalo_min": 1
+      },
+      {
+        "dia": "Lunes",
+        "llegada_anterior_min": 3,
+        "llegada_min": 4,
+        "intervalo_min": 1
+      },
+      {
+        "dia": "Lunes",
+        "llegada_anterior_min": 4,
+        "llegada_min": 6,
+        "intervalo_min": 2
+      },
+      {
+        "dia": "Lunes",
+        "llegada_anterior_min": 6,
+        "llegada_min": 9,
+        "intervalo_min": 3
+      },
+      {
+        "dia": "Lunes",
+        "llegada_anterior_min": 9,
+        "llegada_min": 12,
+        "intervalo_min": 3
+      },
+      {
+        "dia": "Lunes",
+        "llegada_anterior_min": 12,
+        "llegada_min": 14,
+        "intervalo_min": 2
+      },
+      {
+        "dia": "Lunes",
+        "llegada_anterior_min": 14,
+        "llegada_min": 16,
+        "intervalo_min": 2
+      },
+      {
+        "dia": "Lunes",
+        "llegada_anterior_min": 16,
+        "llegada_min": 20,
+        "intervalo_min": 4
+      },
+      {
+        "dia": "Lunes",
+        "llegada_anterior_min": 20,
+        "llegada_min": 23,
+        "intervalo_min": 3
+      },
+      {
+        "dia": "Lunes",
+        "llegada_anterior_min": 23,
+        "llegada_min": 24,
+        "intervalo_min": 1
+      },
+      {
+        "dia": "Lunes",
+        "llegada_anterior_min": 24,
+        "llegada_min": 27,
+        "intervalo_min": 3
+      },
+      {
+        "dia": "Lunes",
+        "llegada_anterior_min": 27,
+        "llegada_min": 28,
+        "intervalo_min": 1
+      },
+      {
+        "dia": "Lunes",
+        "llegada_anterior_min": 28,
+        "llegada_min": 32,
+        "intervalo_min": 4
+      },
+      {
+        "dia": "Lunes",
+        "llegada_anterior_min": 32,
+        "llegada_min": 36,
+        "intervalo_min": 4
+      },
+      {
+        "dia": "Lunes",
+        "llegada_anterior_min": 36,
+        "llegada_min": 38,
+        "intervalo_min": 2
+      },
+      {
+        "dia": "Lunes",
+        "llegada_anterior_min": 38,
+        "llegada_min": 41,
+        "intervalo_min": 3
+      },
+      {
+        "dia": "Lunes",
+        "llegada_anterior_min": 41,
+        "llegada_min": 45,
+        "intervalo_min": 4
+      },
+      {
+        "dia": "Lunes",
+        "llegada_anterior_min": 45,
+        "llegada_min": 48,
+        "intervalo_min": 3
+      },
+      {
+        "dia": "Lunes",
+        "llegada_anterior_min": 48,
+        "llegada_min": 50,
+        "intervalo_min": 2
+      },
+      {
+        "dia": "Lunes",
+        "llegada_anterior_min": 50,
+        "llegada_min": 54,
+        "intervalo_min": 4
+      },
+      {
+        "dia": "Lunes",
+        "llegada_anterior_min": 54,
+        "llegada_min": 58,
+        "intervalo_min": 4
+      },
+      {
+        "dia": "Lunes",
+        "llegada_anterior_min": 58,
+        "llegada_min": 59,
+        "intervalo_min": 1
+      },
+      {
+        "dia": "Lunes",
+        "llegada_anterior_min": 59,
+        "llegada_min": 62,
+        "intervalo_min": 3
+      },
+      {
+        "dia": "Martes",
+        "llegada_anterior_min": 3,
+        "llegada_min": 4,
+        "intervalo_min": 1
+      },
+      {
+        "dia": "Martes",
+        "llegada_anterior_min": 4,
+        "llegada_min": 6,
+        "intervalo_min": 2
+      },
+      {
+        "dia": "Martes",
+        "llegada_anterior_min": 6,
+        "llegada_min": 7,
+        "intervalo_min": 1
+      },
+      {
+        "dia": "Martes",
+        "llegada_anterior_min": 7,
+        "llegada_min": 8,
+        "intervalo_min": 1
+      },
+      {
+        "dia": "Martes",
+        "llegada_anterior_min": 8,
+        "llegada_min": 12,
+        "intervalo_min": 4
+      },
+      {
+        "dia": "Martes",
+        "llegada_anterior_min": 12,
+        "llegada_min": 16,
+        "intervalo_min": 4
+      },
+      {
+        "dia": "Martes",
+        "llegada_anterior_min": 16,
+        "llegada_min": 18,
+        "intervalo_min": 2
+      },
+      {
+        "dia": "Martes",
+        "llegada_anterior_min": 18,
+        "llegada_min": 20,
+        "intervalo_min": 2
+      },
+      {
+        "dia": "Martes",
+        "llegada_anterior_min": 20,
+        "llegada_min": 25,
+        "intervalo_min": 5
+      },
+      {
+        "dia": "Martes",
+        "llegada_anterior_min": 25,
+        "llegada_min": 28,
+        "intervalo_min": 3
+      },
+      {
+        "dia": "Martes",
+        "llegada_anterior_min": 28,
+        "llegada_min": 30,
+        "intervalo_min": 2
+      },
+      {
+        "dia": "Martes",
+        "llegada_anterior_min": 30,
+        "llegada_min": 31,
+        "intervalo_min": 1
+      },
+      {
+        "dia": "Martes",
+        "llegada_anterior_min": 31,
+        "llegada_min": 35,
+        "intervalo_min": 4
+      },
+      {
+        "dia": "Martes",
+        "llegada_anterior_min": 35,
+        "llegada_min": 39,
+        "intervalo_min": 4
+      },
+      {
+        "dia": "Martes",
+        "llegada_anterior_min": 39,
+        "llegada_min": 40,
+        "intervalo_min": 1
+      },
+      {
+        "dia": "Martes",
+        "llegada_anterior_min": 40,
+        "llegada_min": 45,
+        "intervalo_min": 5
+      },
+      {
+        "dia": "Martes",
+        "llegada_anterior_min": 45,
+        "llegada_min": 47,
+        "intervalo_min": 2
+      },
+      {
+        "dia": "Martes",
+        "llegada_anterior_min": 47,
+        "llegada_min": 50,
+        "intervalo_min": 3
+      },
+      {
+        "dia": "Martes",
+        "llegada_anterior_min": 50,
+        "llegada_min": 55,
+        "intervalo_min": 5
+      },
+      {
+        "dia": "Martes",
+        "llegada_anterior_min": 55,
+        "llegada_min": 58,
+        "intervalo_min": 3
+      },
+      {
+        "dia": "Martes",
+        "llegada_anterior_min": 58,
+        "llegada_min": 62,
+        "intervalo_min": 4
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 2,
+        "llegada_min": 3,
+        "intervalo_min": 1
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 3,
+        "llegada_min": 5,
+        "intervalo_min": 2
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 5,
+        "llegada_min": 7,
+        "intervalo_min": 2
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 7,
+        "llegada_min": 7,
+        "intervalo_min": 0
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 7,
+        "llegada_min": 10,
+        "intervalo_min": 3
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 10,
+        "llegada_min": 14,
+        "intervalo_min": 4
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 14,
+        "llegada_min": 15,
+        "intervalo_min": 1
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 15,
+        "llegada_min": 18,
+        "intervalo_min": 3
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 18,
+        "llegada_min": 19,
+        "intervalo_min": 1
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 19,
+        "llegada_min": 22,
+        "intervalo_min": 3
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 22,
+        "llegada_min": 26,
+        "intervalo_min": 4
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 26,
+        "llegada_min": 27,
+        "intervalo_min": 1
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 27,
+        "llegada_min": 30,
+        "intervalo_min": 3
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 30,
+        "llegada_min": 34,
+        "intervalo_min": 4
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 34,
+        "llegada_min": 36,
+        "intervalo_min": 2
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 36,
+        "llegada_min": 38,
+        "intervalo_min": 2
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 38,
+        "llegada_min": 42,
+        "intervalo_min": 4
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 42,
+        "llegada_min": 46,
+        "intervalo_min": 4
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 46,
+        "llegada_min": 47,
+        "intervalo_min": 1
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 47,
+        "llegada_min": 51,
+        "intervalo_min": 4
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 51,
+        "llegada_min": 55,
+        "intervalo_min": 4
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 55,
+        "llegada_min": 57,
+        "intervalo_min": 2
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 57,
+        "llegada_min": 61,
+        "intervalo_min": 4
+      },
+      {
+        "dia": "Viernes",
+        "llegada_anterior_min": 61,
+        "llegada_min": 62,
+        "intervalo_min": 1
+      }
+    ]
+  },
+  "cifras_verificadas": {
+    "Pacientes totales / en pico": "131 / 71",
+    "Por ventanilla (total) V1 / V2 / V3": "47 / 42 / 42",
+    "Por ventanilla (pico) V1 / V2 / V3": "25 / 22 / 24",
+    "Pico general / preferencial": "47 / 24 (suma 3 días)",
+    "Tiempo de atención medio (131)": "4,412 min (σ ≈ 1,01; CV ≈ 0,23)",
+    "General": "media 4,124, σ 0,939, rango 3–6",
+    "Preferencial": "media 5,024, σ 0,897, rango 4–7",
+    "μ por ventanilla": "13,6 pac/h",
+    "λ pico (promedio por día)": "23,67 pac/h (24, 22, 25)",
+    "ρ global hora pico (s=3)": "0,58",
+    "ρ general (V1+V2, s=2) / preferencial (V3, s=1)": "0,54 / 0,67",
+    "Pacientes que esperaron (todos / pico)": "15 de 131 / 7 de 71",
+    "Espera media (pico / resto de jornada)": "0,155 / 0,317 min",
+    "Esperas más largas": "3, 3 y 5 min (entre 09:23 y 09:27, fuera del pico)",
+    "Quién esperó": "V3: 12 de 15; V1: 2; V2: 1",
+    "Cola máxima observada": "1 paciente",
+    "Tiempos entre llegadas en pico (min)": "media 2,63; σ 1,28; **CV ≈ 0,49** (no exponencial: llegadas más regulares que Poisson)"
+  },
+  "referencia_python": {
+    "escenarios": [
+      {
+        "escenario": "base",
+        "wq_min": 0.15353590610460044,
+        "lq": 0.05531376962390206,
+        "rho": 0.5042927346783546,
+        "p_esperar": 0.09305365352166267,
+        "porcentaje_esperas_mayores_5": 0.24670111048371918
+      },
+      {
+        "escenario": "flexible",
+        "wq_min": 0.15022889908502945,
+        "lq": 0.053960945659918255,
+        "rho": 0.5008981423840912,
+        "p_esperar": 0.08838528142084207,
+        "porcentaje_esperas_mayores_5": 0.3076567780046041
+      },
+      {
+        "escenario": "pooled_prioridad",
+        "wq_min": 0.021220602347327117,
+        "lq": 0.007747917050818151,
+        "rho": 0.5051521193926214,
+        "p_esperar": 0.032994508174256455,
+        "porcentaje_esperas_mayores_5": 0.0
+      },
+      {
+        "escenario": "mas_1_ventanilla_general",
+        "wq_min": 0.1317405451928347,
+        "lq": 0.04711538201585273,
+        "rho": 0.3754590439506929,
+        "p_esperar": 0.0783484703752896,
+        "porcentaje_esperas_mayores_5": 0.15739130434782606
+      },
+      {
+        "escenario": "demanda_mas_10pct",
+        "wq_min": 0.22438512999847485,
+        "lq": 0.08978421352084072,
+        "rho": 0.5569879561905046,
+        "p_esperar": 0.11625616611301058,
+        "porcentaje_esperas_mayores_5": 0.6321169589475437
+      },
+      {
+        "escenario": "demanda_mas_25pct",
+        "wq_min": 0.3251507484594921,
+        "lq": 0.1442231512019726,
+        "rho": 0.6308925031563775,
+        "p_esperar": 0.15404387467891167,
+        "porcentaje_esperas_mayores_5": 1.2866147642679902
+      },
+      {
+        "escenario": "demanda_mas_50pct",
+        "wq_min": 0.8056396051355348,
+        "lq": 0.41043494227367044,
+        "rho": 0.7482146052547324,
+        "p_esperar": 0.3080404725092118,
+        "porcentaje_esperas_mayores_5": 4.867231368218369
+      },
+      {
+        "escenario": "demanda_mas_55pct",
+        "wq_min": 0.8866286945140782,
+        "lq": 0.4692033164794835,
+        "rho": 0.7747130452170556,
+        "p_esperar": 0.35581983053655963,
+        "porcentaje_esperas_mayores_5": 5.416645085980824
+      },
+      {
+        "escenario": "demanda_mas_60pct",
+        "wq_min": 1.030299594188511,
+        "lq": 0.5537611750608405,
+        "rho": 0.7937784909936061,
+        "p_esperar": 0.3944473237632784,
+        "porcentaje_esperas_mayores_5": 6.320011665636511
+      },
+      {
+        "escenario": "base_exponencial_contraste",
+        "wq_min": 2.4550089270155793,
+        "lq": 0.8460799831947566,
+        "rho": 0.5034584420629982,
+        "p_esperar": 0.36752399577619044,
+        "porcentaje_esperas_mayores_5": 15.961319011843022
+      }
+    ],
+    "comparacion_base": [
+      {
+        "fuente": "teoría",
+        "modelo": "M/M/3",
+        "grupo": "Global",
+        "wq_min": 1.1547360057400051,
+        "lq": 0.4554792022641132,
+        "rho": 0.5801243992083688,
+        "p_esperar": 0.32966136911274146,
+        "porcentaje_esperas_mayores_5": null
+      },
+      {
+        "fuente": "teoría",
+        "modelo": "M/M/2",
+        "grupo": "General",
+        "wq_min": 1.682892433767104,
+        "lq": 0.4394219132614105,
+        "rho": 0.538358302122347,
+        "p_esperar": 0.37680384480546836,
+        "porcentaje_esperas_mayores_5": null
+      },
+      {
+        "fuente": "teoría",
+        "modelo": "M/M/1",
+        "grupo": "Preferencial",
+        "wq_min": 10.192536630036635,
+        "lq": 1.3590048840048847,
+        "rho": 0.6698412698412699,
+        "p_esperar": 0.66984126984127,
+        "porcentaje_esperas_mayores_5": null
+      },
+      {
+        "fuente": "simulación",
+        "modelo": "exponencial/estacionaria",
+        "grupo": "Global",
+        "wq_min": 1.1605731034885478,
+        "lq": null,
+        "rho": 0.5801994888814637,
+        "p_esperar": 0.33000691787285724,
+        "porcentaje_esperas_mayores_5": null
+      },
+      {
+        "fuente": "simulación",
+        "modelo": "exponencial/estacionaria",
+        "grupo": "General",
+        "wq_min": 1.6769725556511188,
+        "lq": null,
+        "rho": 0.5383621161844014,
+        "p_esperar": 0.37630908730776674,
+        "porcentaje_esperas_mayores_5": null
+      },
+      {
+        "fuente": "simulación",
+        "modelo": "exponencial/estacionaria",
+        "grupo": "Preferencial",
+        "wq_min": 10.202727382811569,
+        "lq": null,
+        "rho": 0.6698902849544087,
+        "p_esperar": 0.67070035576441,
+        "porcentaje_esperas_mayores_5": null
+      },
+      {
+        "fuente": "observado",
+        "modelo": "franja pico, datos",
+        "grupo": "General",
+        "wq_min": 0.10638297872340426,
+        "lq": 0.027777777777777776,
+        "rho": 0.5083333333333333,
+        "p_esperar": 0.06382978723404255,
+        "porcentaje_esperas_mayores_5": 0.0
+      },
+      {
+        "fuente": "observado",
+        "modelo": "franja pico, datos",
+        "grupo": "Preferencial",
+        "wq_min": 0.25,
+        "lq": 0.027777777777777776,
+        "rho": 0.5944444444444444,
+        "p_esperar": 0.16666666666666666,
+        "porcentaje_esperas_mayores_5": 0.0
+      },
+      {
+        "fuente": "observado",
+        "modelo": "franja pico, datos",
+        "grupo": "Global",
+        "wq_min": 0.15492957746478872,
+        "lq": 0.05555555555555555,
+        "rho": 0.5370370370370371,
+        "p_esperar": 0.09859154929577464,
+        "porcentaje_esperas_mayores_5": 0.0
+      }
+    ]
+  },
+  "meta": {
+    "fecha_exportacion": "2026-11-09T16:54:06-05:00",
+    "version_codigo": "286faa1",
+    "semilla_usada": 20261101
+  }
 }

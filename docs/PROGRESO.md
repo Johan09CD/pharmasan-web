@@ -1,5 +1,16 @@
 # Progreso
 
+## 2026-11-09 — Exportación de datos observados
+
+- **Hecho:** recibido desde `pharmasan-sim` el JSON con pacientes observados,
+  franja pico, conteos de llegadas, ajustes de atención y referencias Python.
+- **Archivos:** `data/observados.json`, `docs/PLAN.md`, `docs/PROGRESO.md` y
+  `docs/DECISIONES.md`.
+- **Resultados:** 131 registros observados y 71 pacientes en pico; las cifras
+  verificadas se calculan desde los datos fuente y coinciden con el contexto.
+  La fase 1 de exportación queda completada.
+- **Pendiente:** implementar la vista de datos observados de acuerdo con la fase 3.
+
 ## 2026-11-09 — Creación del esqueleto inicial
 
 - **Hecho:** creada la estructura estática del proyecto, sus módulos ES vacíos,
