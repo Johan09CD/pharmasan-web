@@ -1,5 +1,28 @@
 # Progreso
 
+## 2026-11-09 — Maqueta arquitectónica 3D del local
+
+- **Hecho:** solicitadas fotos/medidas y distribución antes de modelar. El
+  usuario no tiene fotos ni medidas e indicó la puerta a la izquierda de las
+  ventanillas y la espera al frente; se rotuló la escena como
+  «Representación esquemática, no a escala». Construida planta Three.js con
+  entrada, paredes bajas, mostrador y V1/V2 General, V3 Adulto Mayor,
+  estantería, señal preferencial, dos filas delimitadas por postes/cintas con
+  30 posiciones cada una y sillas instanciadas. Se añadieron iluminación,
+  sombras, fondo degradado CSS, cámara orbital adaptable y vistas cenital,
+  isométrica, frontal y «Ver fila». La escena no incluye personas.
+- **Archivos:** `src/escena/local3d.js`, `src/escena/camara.js`, `src/ui/app.js`,
+  `src/ui/estilos.css`, `index.html`, `tests/escena.test.js`, `README.md`,
+  `docs/PLAN.md`, `docs/PROGRESO.md` y `docs/DECISIONES.md`.
+- **Resultados:** **60** posiciones de fila, **12** sillas instanciadas,
+  estantería por instancias; render limitado a **30 fps** y calidad reducida
+  desde **120 personas**. `node --test`: **32 aprobadas, 0 fallidas**; escena
+  servida localmente y revisada en navegador. Capturas de las vistas cenital,
+  isométrica y frontal entregadas para revisión.
+- **Pendiente:** revisar la maqueta con el usuario; ajustar la planta si aporta
+  medidas/fotos y continuar fase 5 (animación/HUD), sin animar personas en esta
+  tarea.
+
 ## 2026-11-09 — Selector y reproducción de observaciones
 
 - **Hecho:** comparado el Prompt 3 con lo implementado. El motor y su prueba

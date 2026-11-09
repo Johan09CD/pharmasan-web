@@ -1,5 +1,6 @@
 import { simular } from "../engine/simulador.js";
 import { correrReplicas } from "../engine/replicas.js";
+import { crearLocal3D } from "../escena/local3d.js";
 import { crearConfiguracionBase } from "./observados.js";
 import {
   compararReproduccionObservada,
@@ -26,6 +27,8 @@ const listaCifras = document.querySelector("#lista-cifras");
 const resumenSeleccion = document.querySelector("#resumen-seleccion");
 const estadoComparacion = document.querySelector("#estado-comparacion");
 const lineaTiempo = document.querySelector("#linea-tiempo");
+const contenedorEscena = document.querySelector("#escena-local");
+const estadoEscena = document.querySelector("#estado-escena");
 const numeroReplicas = 500;
 const formatoMinutos = new Intl.NumberFormat("es-CO", {
   minimumFractionDigits: 3,
@@ -233,6 +236,39 @@ function mostrarLineaTiempo(pacientes, datos) {
 let datosObservados;
 let referenciaBase;
 let numeroCorrida = 0;
+let escenaLocal;
+
+try {
+  escenaLocal = crearLocal3D(contenedorEscena);
+  escenaLocal.actualizarCalidad(0);
+  estadoEscena.textContent =
+    "Maqueta lista: 60 espacios de fila, 12 sillas y controles orbitales.";
+  document.querySelectorAll("[data-vista]").forEach((boton) => {
+    boton.addEventListener("click", () => {
+      try {
+        escenaLocal.establecerVista(boton.dataset.vista);
+        document
+          .querySelectorAll("[data-vista]")
+          .forEach((elemento) => elemento.setAttribute("aria-pressed", "false"));
+        boton.setAttribute("aria-pressed", "true");
+      } catch (error) {
+        estadoEscena.textContent = `No fue posible cambiar la vista: ${error.message}`;
+        estadoEscena.className = "estado estado-error";
+      }
+    });
+  });
+  contenedorEscena.addEventListener("calidadescena", (evento) => {
+    estadoEscena.textContent = evento.detail.reducida
+      ? `Calidad reducida automáticamente para ${evento.detail.cantidadPersonas} personas.`
+      : "Maqueta lista: 60 espacios de fila, 12 sillas y controles orbitales.";
+  });
+  document
+    .querySelector('[data-vista="isometrica"]')
+    .setAttribute("aria-pressed", "true");
+} catch (error) {
+  estadoEscena.textContent = `No fue posible cargar la maqueta 3D local: ${error.message}`;
+  estadoEscena.className = "estado estado-error";
+}
 
 botonBase.addEventListener("click", async () => {
   if (!datosObservados || !referenciaBase) {

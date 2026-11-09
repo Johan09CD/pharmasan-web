@@ -1,4 +1,646 @@
 import * as THREE from "../../vendor/three/three.module.js";
 import { OrbitControls } from "../../vendor/three/OrbitControls.js";
+import { crearCamaraEscena } from "./camara.js";
 
-export { THREE, OrbitControls };
+const PALETA = {
+  piso: 0xe9e6de,
+  pared: 0xf3f1ea,
+  borde: 0xd5d0c4,
+  madera: 0x806a56,
+  maderaClara: 0xa4896d,
+  maderaOscura: 0x55483b,
+  verde: 0x27664b,
+  verdeOscuro: 0x174b37,
+  general: 0x397d65,
+  preferencial: 0xc07b43,
+  dorado: 0xd4ad63,
+  blanco: 0xffffff,
+  gris: 0x6a7772,
+  libro1: 0x4a8292,
+  libro2: 0xc7795c,
+  libro3: 0xd5b45d,
+  libro4: 0x78966d,
+};
+
+const GEOMETRIA_LOCAL = { ancho: 20, fondo: 14, x: 10, z: 7 };
+export const CAPACIDAD_FILAS = 60;
+export const UMBRAL_CALIDAD_REDUCIDA = 120;
+export const FPS_OBJETIVO = 30;
+
+export function requiereCalidadReducida(cantidadPersonas) {
+  if (!Number.isInteger(cantidadPersonas) || cantidadPersonas < 0) {
+    throw new RangeError("La cantidad de personas debe ser un entero no negativo.");
+  }
+  return cantidadPersonas >= UMBRAL_CALIDAD_REDUCIDA;
+}
+
+function crearGeometrias() {
+  const caja = new Map();
+  const estandar = new Map();
+
+  function geometriaCaja(ancho, alto, fondo) {
+    const clave = `${ancho}|${alto}|${fondo}`;
+    if (!caja.has(clave)) {
+      caja.set(clave, new THREE.BoxGeometry(ancho, alto, fondo));
+    }
+    return caja.get(clave);
+  }
+
+  function material(color, opciones = {}) {
+    const clave = `${color}|${JSON.stringify(opciones)}`;
+    if (!estandar.has(clave)) {
+      estandar.set(
+        clave,
+        new THREE.MeshStandardMaterial({
+          color,
+          roughness: 0.78,
+          metalness: 0.02,
+          ...opciones,
+        }),
+      );
+    }
+    return estandar.get(clave);
+  }
+
+  return { geometriaCaja, material, caja, materiales: estandar };
+}
+
+function crearCartel(texto, opciones = {}) {
+  const ancho = opciones.ancho ?? 768;
+  const alto = opciones.alto ?? 192;
+  const canvas = document.createElement("canvas");
+  canvas.width = ancho;
+  canvas.height = alto;
+  const contexto = canvas.getContext("2d");
+  if (!contexto) {
+    throw new Error("No se pudo preparar el rótulo de la maqueta.");
+  }
+
+  contexto.fillStyle = opciones.fondo ?? "#174b37";
+  contexto.fillRect(0, 0, ancho, alto);
+  contexto.fillStyle = opciones.acento ?? "#d4ad63";
+  contexto.fillRect(0, alto - 13, ancho, 13);
+  contexto.fillStyle = "#ffffff";
+  contexto.textAlign = "center";
+  contexto.textBaseline = "middle";
+  contexto.font = `700 ${opciones.tamano ?? 58}px system-ui, sans-serif`;
+  contexto.fillText(texto, ancho / 2, alto / 2 - 5, ancho - 48);
+
+  const textura = new THREE.CanvasTexture(canvas);
+  textura.colorSpace = THREE.SRGBColorSpace;
+  return textura;
+}
+
+function agregarCartel(escena, texto, posicion, dimensiones, opciones = {}) {
+  const textura = crearCartel(texto, opciones);
+  const geometria = new THREE.PlaneGeometry(...dimensiones);
+  const material = new THREE.MeshBasicMaterial({
+    map: textura,
+    toneMapped: false,
+  });
+  const cartel = new THREE.Mesh(geometria, material);
+  cartel.position.set(...posicion);
+  if (opciones.rotacionX) {
+    cartel.rotation.x = opciones.rotacionX;
+  }
+  escena.add(cartel);
+  return cartel;
+}
+
+function agregarCaja(escena, geometriaCaja, material, dimensiones, posicion, rotacionY = 0) {
+  const malla = new THREE.Mesh(
+    geometriaCaja(...dimensiones),
+    material,
+  );
+  malla.position.set(...posicion);
+  malla.rotation.y = rotacionY;
+  malla.castShadow = true;
+  malla.receiveShadow = true;
+  escena.add(malla);
+  return malla;
+}
+
+function transformarInstancia(malla, indice, posicion, escala, rotacionY = 0) {
+  const matriz = new THREE.Matrix4();
+  const cuaternion = new THREE.Quaternion().setFromEuler(
+    new THREE.Euler(0, rotacionY, 0),
+  );
+  matriz.compose(
+    new THREE.Vector3(...posicion),
+    cuaternion,
+    new THREE.Vector3(...escala),
+  );
+  malla.setMatrixAt(indice, matriz);
+}
+
+function crearEstanteria(escena, recursos) {
+  const { geometriaCaja, material } = recursos;
+  const ancho = 12.6;
+  const z = -5.75;
+  const verde = material(PALETA.verdeOscuro);
+  const madera = material(PALETA.madera);
+  const cajas = new Map([
+    [PALETA.libro1, []],
+    [PALETA.libro2, []],
+    [PALETA.libro3, []],
+    [PALETA.libro4, []],
+  ]);
+
+  agregarCaja(escena, geometriaCaja, verde, [ancho, 0.12, 0.15], [0, 0.68, z]);
+  agregarCaja(escena, geometriaCaja, verde, [ancho, 0.12, 0.15], [0, 1.53, z]);
+  agregarCaja(escena, geometriaCaja, verde, [ancho, 0.12, 0.15], [0, 2.38, z]);
+  agregarCaja(escena, geometriaCaja, verde, [ancho, 0.12, 0.15], [0, 3.23, z]);
+
+  for (const x of [-6.25, -2.1, 2.1, 6.25]) {
+    agregarCaja(
+      escena,
+      geometriaCaja,
+      madera,
+      [0.12, 2.72, 0.22],
+      [x, 1.96, z],
+    );
+  }
+
+  for (let fila = 0; fila < 3; fila += 1) {
+    const y = 0.98 + fila * 0.85;
+    for (let columna = 0; columna < 20; columna += 1) {
+      const x = -5.88 + columna * 0.61;
+      const color = [PALETA.libro1, PALETA.libro2, PALETA.libro3, PALETA.libro4][
+        (columna * 7 + fila * 3) % 4
+      ];
+      cajas.get(color).push([x, y, z + 0.22]);
+    }
+  }
+
+  for (const [color, posiciones] of cajas) {
+    const malla = new THREE.InstancedMesh(
+      geometriaCaja(0.39, 0.52, 0.35),
+      material(color, { roughness: 0.64 }),
+      posiciones.length,
+    );
+    posiciones.forEach((posicion, indice) =>
+      transformarInstancia(malla, indice, posicion, [1, 1, 1]),
+    );
+    malla.castShadow = true;
+    escena.add(malla);
+  }
+}
+
+function crearVentanillas(escena, recursos) {
+  const { geometriaCaja, material } = recursos;
+  const madera = material(PALETA.madera);
+  const tablero = material(PALETA.maderaOscura);
+  const centros = [-4.65, -0.5, 4.35];
+  const rotulos = [
+    { texto: "V1 · GENERAL", fondo: "#27664b" },
+    { texto: "V2 · GENERAL", fondo: "#27664b" },
+    { texto: "V3 · ADULTO MAYOR", fondo: "#a65f31", tamano: 48 },
+  ];
+
+  agregarCaja(
+    escena,
+    geometriaCaja,
+    madera,
+    [15, 1.06, 1.05],
+    [0, 0.57, -1.72],
+  );
+  agregarCaja(
+    escena,
+    geometriaCaja,
+    tablero,
+    [15.25, 0.15, 1.25],
+    [0, 1.15, -1.72],
+  );
+
+  for (let indice = 0; indice < centros.length; indice += 1) {
+    const centro = centros[indice];
+    agregarCaja(
+      escena,
+      geometriaCaja,
+      material(indice === 2 ? PALETA.preferencial : PALETA.general),
+      [3.45, 0.1, 0.08],
+      [centro, 1.24, -1.05],
+    );
+    agregarCartel(
+      escena,
+      rotulos[indice].texto,
+      [centro, 2.05, -1.11],
+      [3.4, 0.76],
+      { fondo: rotulos[indice].fondo, tamano: rotulos[indice].tamano },
+    );
+  }
+
+  agregarCartel(
+    escena,
+    "ATENCIÓN PREFERENCIAL · ADULTO MAYOR",
+    [5.4, 2.82, -4.95],
+    [5.7, 0.82],
+    { fondo: "#a65f31", tamano: 42, acento: "#f0d7b1" },
+  );
+}
+
+function crearPostesYCintas(escena, recursos) {
+  const { material } = recursos;
+  const postes = [];
+  const cintas = [];
+  const zonas = [
+    { x0: -7.05, x1: -0.35, z0: -0.12, z1: 5.85 },
+    { x0: 0.4, x1: 7.1, z0: -0.12, z1: 5.85 },
+  ];
+
+  for (const zona of zonas) {
+    const xs = [zona.x0, (zona.x0 + zona.x1) / 2, zona.x1];
+    const zs = [zona.z0, (zona.z0 + zona.z1) / 2, zona.z1];
+    for (const x of xs) {
+      postes.push([x, 0, zona.z0], [x, 0, zona.z1]);
+    }
+    for (const z of zs) {
+      postes.push([zona.x0, 0, z], [zona.x1, 0, z]);
+    }
+
+    cintas.push(
+      [[zona.x0, 0.86, zona.z0], [zona.x1, 0.86, zona.z0]],
+      [[zona.x0, 0.86, zona.z1], [zona.x1, 0.86, zona.z1]],
+      [[zona.x0, 0.86, zona.z0], [zona.x0, 0.86, zona.z1]],
+      [[zona.x1, 0.86, zona.z0], [zona.x1, 0.86, zona.z1]],
+    );
+  }
+
+  const base = new THREE.InstancedMesh(
+    new THREE.CylinderGeometry(0.18, 0.2, 0.12, 16),
+    material(0xa6a59f, { metalness: 0.42, roughness: 0.38 }),
+    postes.length,
+  );
+  const tubo = new THREE.InstancedMesh(
+    new THREE.CylinderGeometry(0.047, 0.055, 0.86, 12),
+    material(PALETA.maderaOscura, { metalness: 0.22, roughness: 0.42 }),
+    postes.length,
+  );
+
+  postes.forEach((posicion, indice) => {
+    transformarInstancia(base, indice, [posicion[0], 0.07, posicion[2]], [1, 1, 1]);
+    transformarInstancia(tubo, indice, [posicion[0], 0.53, posicion[2]], [1, 1, 1]);
+  });
+  base.castShadow = true;
+  tubo.castShadow = true;
+  escena.add(base, tubo);
+
+  const cintasMalla = new THREE.InstancedMesh(
+    new THREE.BoxGeometry(1, 1, 1),
+    material(PALETA.verde, { roughness: 0.55 }),
+    cintas.length,
+  );
+  cintas.forEach(([inicio, fin], indice) => {
+    const dx = fin[0] - inicio[0];
+    const dz = fin[2] - inicio[2];
+    const longitud = Math.hypot(dx, dz);
+    const angulo = Math.atan2(-dz, dx);
+    transformarInstancia(
+      cintasMalla,
+      indice,
+      [(inicio[0] + fin[0]) / 2, inicio[1], (inicio[2] + fin[2]) / 2],
+      [longitud, 0.045, 0.045],
+      angulo,
+    );
+  });
+  escena.add(cintasMalla);
+
+  const espaciosPorZona = [];
+  const columnasPorFila = 5;
+  const filasPorZona = CAPACIDAD_FILAS / (zonas.length * columnasPorFila);
+  for (const zona of zonas) {
+    const espacios = [];
+    for (let fila = 0; fila < filasPorZona; fila += 1) {
+      for (let columna = 0; columna < columnasPorFila; columna += 1) {
+        espacios.push([
+          zona.x0 + 0.72 + columna * 1.31,
+          0.035,
+          zona.z0 + 0.55 + fila * 0.98,
+        ]);
+      }
+    }
+    espaciosPorZona.push(espacios);
+  }
+  const geometriaMarca = new THREE.CylinderGeometry(0.105, 0.105, 0.025, 16);
+  espaciosPorZona.forEach((espacios, indiceZona) => {
+    const marcas = new THREE.InstancedMesh(
+      geometriaMarca,
+      material(
+        indiceZona === 0 ? PALETA.general : PALETA.preferencial,
+        { roughness: 0.88 },
+      ),
+      espacios.length,
+    );
+    espacios.forEach((posicion, indice) =>
+      transformarInstancia(marcas, indice, posicion, [1, 1, 1]),
+    );
+    escena.add(marcas);
+  });
+
+  agregarCartel(
+    escena,
+    "GENERAL · 30 ESPACIOS",
+    [-3.7, 0.025, 0.35],
+    [4.8, 0.62],
+    { rotacionX: -Math.PI / 2, fondo: "#27664b", tamano: 50 },
+  );
+  agregarCartel(
+    escena,
+    "PREFERENCIAL · 30 ESPACIOS",
+    [3.75, 0.025, 0.35],
+    [5.2, 0.62],
+    { rotacionX: -Math.PI / 2, fondo: "#a65f31", tamano: 48 },
+  );
+
+  return espaciosPorZona.flat().length;
+}
+
+function crearSillasInstanciadas(escena, recursos) {
+  const { geometriaCaja, material } = recursos;
+  const sillas = [];
+  for (let indice = 0; indice < 6; indice += 1) {
+    sillas.push([-9.05, 0.45, -1.2 + indice * 1.35]);
+    sillas.push([9.05, 0.45, -1.2 + indice * 1.35]);
+  }
+
+  const componentes = [
+    {
+      geometria: geometriaCaja(0.68, 0.13, 0.62),
+      material: material(PALETA.verdeOscuro),
+      posicion: (silla) => [silla[0], silla[1], silla[2]],
+      escala: [1, 1, 1],
+    },
+    {
+      geometria: geometriaCaja(0.68, 0.67, 0.12),
+      material: material(PALETA.maderaClara),
+      posicion: (silla) => [silla[0], silla[1] + 0.4, silla[2] + 0.26],
+      escala: [1, 1, 1],
+    },
+    {
+      geometria: geometriaCaja(0.09, 0.42, 0.09),
+      material: material(PALETA.maderaOscura),
+      posicion: (silla) => [silla[0] - 0.25, silla[1] - 0.23, silla[2] - 0.22],
+      escala: [1, 1, 1],
+    },
+    {
+      geometria: geometriaCaja(0.09, 0.42, 0.09),
+      material: material(PALETA.maderaOscura),
+      posicion: (silla) => [silla[0] + 0.25, silla[1] - 0.23, silla[2] - 0.22],
+      escala: [1, 1, 1],
+    },
+    {
+      geometria: geometriaCaja(0.09, 0.42, 0.09),
+      material: material(PALETA.maderaOscura),
+      posicion: (silla) => [silla[0] - 0.25, silla[1] - 0.23, silla[2] + 0.22],
+      escala: [1, 1, 1],
+    },
+    {
+      geometria: geometriaCaja(0.09, 0.42, 0.09),
+      material: material(PALETA.maderaOscura),
+      posicion: (silla) => [silla[0] + 0.25, silla[1] - 0.23, silla[2] + 0.22],
+      escala: [1, 1, 1],
+    },
+  ];
+
+  for (const componente of componentes) {
+    const instancias = new THREE.InstancedMesh(
+      componente.geometria,
+      componente.material,
+      sillas.length,
+    );
+    sillas.forEach((silla, indice) =>
+      transformarInstancia(
+        instancias,
+        indice,
+        componente.posicion(silla),
+        componente.escala,
+      ),
+    );
+    instancias.castShadow = true;
+    instancias.receiveShadow = true;
+    escena.add(instancias);
+  }
+  return sillas.length;
+}
+
+function crearLocal(escena, recursos) {
+  const { geometriaCaja, material } = recursos;
+  const piso = material(PALETA.piso, { roughness: 0.94 });
+  const paredes = material(PALETA.pared);
+  const borde = material(PALETA.borde);
+  const madera = material(PALETA.madera);
+
+  agregarCaja(
+    escena,
+    geometriaCaja,
+    piso,
+    [GEOMETRIA_LOCAL.ancho, 0.3, GEOMETRIA_LOCAL.fondo],
+    [0, -0.2, 0],
+  );
+  agregarCaja(
+    escena,
+    geometriaCaja,
+    borde,
+    [GEOMETRIA_LOCAL.ancho + 0.5, 0.16, GEOMETRIA_LOCAL.fondo + 0.5],
+    [0, -0.39, 0],
+  );
+
+  agregarCaja(escena, geometriaCaja, paredes, [0.28, 1.65, 14], [-9.86, 0.72, 0]);
+  agregarCaja(escena, geometriaCaja, paredes, [0.28, 1.65, 14], [9.86, 0.72, 0]);
+  agregarCaja(escena, geometriaCaja, paredes, [20, 1.65, 0.28], [0, 0.72, -6.86]);
+  agregarCaja(escena, geometriaCaja, paredes, [0.9, 0.8, 0.28], [-9.55, 0.3, 6.86]);
+  agregarCaja(escena, geometriaCaja, paredes, [17, 0.8, 0.28], [1.5, 0.3, 6.86]);
+  agregarCaja(escena, geometriaCaja, madera, [0.12, 0.13, 14], [-9.65, 1.58, 0]);
+  agregarCaja(escena, geometriaCaja, madera, [0.12, 0.13, 14], [9.65, 1.58, 0]);
+
+  agregarCaja(escena, geometriaCaja, borde, [2.1, 0.16, 0.28], [-8.05, 2.68, 6.86]);
+  agregarCaja(escena, geometriaCaja, material(PALETA.maderaClara), [0.14, 2.65, 0.2], [-9.05, 1.32, 6.52]);
+  agregarCaja(escena, geometriaCaja, material(PALETA.maderaClara), [0.14, 2.65, 0.2], [-7.05, 1.32, 6.52]);
+  const puerta = new THREE.Group();
+  puerta.position.set(-9.05, 0, 6.52);
+  puerta.rotation.y = Math.PI / 2;
+  const hojaPuerta = new THREE.Mesh(
+    geometriaCaja(2, 2.55, 0.12),
+    borde,
+  );
+  hojaPuerta.position.set(1, 1.28, 0);
+  hojaPuerta.castShadow = true;
+  hojaPuerta.receiveShadow = true;
+  puerta.add(hojaPuerta);
+  const manija = new THREE.Mesh(
+    geometriaCaja(0.055, 0.23, 0.055),
+    material(PALETA.dorado, { metalness: 0.5, roughness: 0.35 }),
+  );
+  manija.position.set(0.82, 1.35, -0.095);
+  puerta.add(manija);
+  escena.add(puerta);
+  agregarCartel(
+    escena,
+    "ENTRADA",
+    [-8.05, 3.05, 6.55],
+    [1.75, 0.52],
+    { fondo: "#55483b", tamano: 54 },
+  );
+
+  agregarCartel(
+    escena,
+    "Droguería Pharmasan",
+    [0, 4.15, -6.62],
+    [8.6, 1.22],
+    { tamano: 66 },
+  );
+
+  const grid = new THREE.GridHelper(19.8, 22, 0xd6d2c9, 0xdedbd4);
+  grid.position.y = -0.045;
+  grid.material.transparent = true;
+  grid.material.opacity = 0.23;
+  escena.add(grid);
+
+  crearEstanteria(escena, recursos);
+  crearVentanillas(escena, recursos);
+
+  agregarCartel(
+    escena,
+    "ACCESO A SALA DE ESPERA",
+    [-3.55, 0.025, 6.1],
+    [4.8, 0.48],
+    { rotacionX: -Math.PI / 2, fondo: "#777c77", tamano: 44 },
+  );
+}
+
+function crearFondo(escena) {
+  escena.background = null;
+  escena.fog = new THREE.Fog(0xdce9e7, 38, 78);
+
+  const sueloExterior = new THREE.Mesh(
+    new THREE.PlaneGeometry(200, 200),
+    new THREE.MeshStandardMaterial({
+      color: 0xd8e3df,
+      roughness: 1,
+      metalness: 0,
+    }),
+  );
+  sueloExterior.rotation.x = -Math.PI / 2;
+  sueloExterior.position.y = -0.52;
+  sueloExterior.receiveShadow = true;
+  escena.add(sueloExterior);
+
+  const luzAmbiente = new THREE.HemisphereLight(0xf6f7f3, 0x8e9b91, 2.15);
+  escena.add(luzAmbiente);
+  const luzSol = new THREE.DirectionalLight(0xfff4df, 3.1);
+  luzSol.position.set(-11, 19, 13);
+  luzSol.castShadow = true;
+  luzSol.shadow.mapSize.set(2048, 2048);
+  luzSol.shadow.camera.left = -17;
+  luzSol.shadow.camera.right = 17;
+  luzSol.shadow.camera.top = 17;
+  luzSol.shadow.camera.bottom = -17;
+  luzSol.shadow.normalBias = 0.035;
+  luzSol.shadow.radius = 5;
+  escena.add(luzSol);
+}
+
+export function crearLocal3D(contenedor) {
+  if (!contenedor) {
+    throw new TypeError("Se requiere el contenedor de la maqueta 3D.");
+  }
+
+  const renderer = new THREE.WebGLRenderer({
+    alpha: true,
+    antialias: true,
+    powerPreference: "high-performance",
+  });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.08;
+  renderer.domElement.setAttribute(
+    "aria-label",
+    "Maqueta tridimensional esquemática de Droguería Pharmasan",
+  );
+  contenedor.replaceChildren(renderer.domElement);
+
+  const escena = new THREE.Scene();
+  const recursos = crearGeometrias();
+  crearFondo(escena);
+  crearLocal(escena, recursos);
+  const espaciosFila = crearPostesYCintas(escena, recursos);
+  const sillas = crearSillasInstanciadas(escena, recursos);
+  const camara = crearCamaraEscena(THREE, contenedor, renderer);
+
+  let ultimaActualizacion = 0;
+  let calidadReducida = false;
+  let cantidadPersonas = 0;
+
+  function actualizarCalidad(cantidad) {
+    const reducida = requiereCalidadReducida(cantidad);
+    cantidadPersonas = cantidad;
+    if (reducida === calidadReducida) {
+      return;
+    }
+    calidadReducida = reducida;
+    renderer.setPixelRatio(
+      Math.min(window.devicePixelRatio || 1, calidadReducida ? 0.85 : 1.5),
+    );
+    renderer.shadowMap.enabled = !calidadReducida;
+    renderer.shadowMap.needsUpdate = true;
+    camara.redimensionar();
+    contenedor.dataset.calidad = calidadReducida
+      ? "reducida"
+      : "completa";
+    contenedor.dispatchEvent(
+      new CustomEvent("calidadescena", {
+        detail: { reducida: calidadReducida, cantidadPersonas },
+      }),
+    );
+  }
+
+  function animar(tiempo) {
+    if (tiempo - ultimaActualizacion >= 1000 / FPS_OBJETIVO) {
+      camara.controles.update();
+      renderer.render(escena, camara.camara);
+      ultimaActualizacion = tiempo;
+    }
+  }
+
+  const observador = new ResizeObserver(camara.redimensionar);
+  observador.observe(contenedor);
+  camara.redimensionar();
+  renderer.setAnimationLoop(animar);
+
+  return {
+    establecerVista: camara.establecerVista,
+    vistas: camara.vistas,
+    actualizarCalidad,
+    obtenerEstado: () => ({
+      calidadReducida,
+      cantidadPersonas,
+      espaciosFila,
+      sillas: sillas,
+      fpsObjetivo: FPS_OBJETIVO,
+    }),
+    dispose() {
+      renderer.setAnimationLoop(null);
+      observador.disconnect();
+      camara.controles.dispose();
+      escena.traverse((objeto) => {
+        if (objeto.isMesh || objeto.isInstancedMesh) {
+          objeto.geometry?.dispose();
+          const materiales = Array.isArray(objeto.material)
+            ? objeto.material
+            : [objeto.material];
+          for (const elemento of materiales) {
+            elemento?.map?.dispose();
+            elemento?.dispose();
+          }
+        }
+      });
+      renderer.dispose();
+      renderer.domElement.remove();
+    },
+  };
+}
+
+export { OrbitControls, THREE };

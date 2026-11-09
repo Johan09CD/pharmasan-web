@@ -69,6 +69,89 @@ h2 {
   box-shadow: 0 0.5rem 1.75rem rgb(24 53 43 / 6%);
 }
 
+.panel-escena {
+  padding: clamp(0.9rem, 3vw, 1.5rem);
+}
+
+.cabecera-escena {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.cabecera-escena h2 {
+  margin-bottom: 0.25rem;
+}
+
+.cabecera-escena .nota-resultados {
+  margin-bottom: 0.75rem;
+}
+
+.marca-esquematica {
+  display: inline-flex;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid #d6bd88;
+  border-radius: 999px;
+  background: #fff8e9;
+  color: #725922;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.controles-vista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.5rem 0 0.75rem;
+}
+
+.controles-vista button {
+  min-height: 2.35rem;
+  padding: 0.45rem 0.75rem;
+  background: #e8efea;
+  color: #214d39;
+  font-size: 0.88rem;
+}
+
+.controles-vista button:hover:enabled,
+.controles-vista button[aria-pressed="true"] {
+  background: #27664b;
+  color: #fff;
+}
+
+.escena-local {
+  position: relative;
+  height: clamp(390px, 62vh, 760px);
+  min-height: 360px;
+  overflow: hidden;
+  border: 1px solid #cbd9d1;
+  border-radius: 0.75rem;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgb(255 255 255 / 78%), transparent 58%),
+    linear-gradient(180deg, #c9dfe1 0%, #e6ece9 55%, #cbd9d1 100%);
+  touch-action: none;
+}
+
+.escena-local canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.escena-local[data-calidad="reducida"]::after {
+  position: absolute;
+  right: 0.65rem;
+  bottom: 0.65rem;
+  padding: 0.3rem 0.55rem;
+  border-radius: 0.3rem;
+  background: rgb(24 53 43 / 78%);
+  color: #fff;
+  content: "Calidad reducida";
+  font-size: 0.75rem;
+}
+
 button {
   min-height: 2.75rem;
   padding: 0.7rem 1rem;
@@ -327,6 +410,22 @@ td small {
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  @media (max-width: 560px) {
+    .aplicacion {
+      width: min(100% - 1rem, 760px);
+      padding-top: 1.5rem;
+    }
+
+    .escena-local {
+      height: 54vh;
+      min-height: 360px;
+    }
+
+    .controles-vista button {
+      flex: 1 1 calc(50% - 0.5rem);
     }
   }
 }

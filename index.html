@@ -17,6 +17,35 @@
         </p>
       </header>
 
+      <section class="panel panel-escena" aria-labelledby="titulo-escena">
+        <div class="cabecera-escena">
+          <div>
+            <h2 id="titulo-escena">Vista del local</h2>
+            <p class="nota-resultados">
+              Entrada a la izquierda; zona de espera frente al mostrador.
+            </p>
+          </div>
+          <span class="marca-esquematica">
+            Representación esquemática, no a escala
+          </span>
+        </div>
+        <div class="controles-vista" role="group" aria-label="Vistas de la maqueta">
+          <button type="button" data-vista="cenital">Cenital</button>
+          <button type="button" data-vista="isometrica">Isométrica</button>
+          <button type="button" data-vista="frontal">Frontal</button>
+          <button type="button" data-vista="fila">Ver fila</button>
+        </div>
+        <div
+          id="escena-local"
+          class="escena-local"
+          data-calidad="completa"
+          aria-label="Maqueta 3D del interior del local"
+        ></div>
+        <p id="estado-escena" class="estado" role="status" aria-live="polite">
+          Preparando la maqueta 3D…
+        </p>
+      </section>
+
       <section class="panel" aria-labelledby="titulo-simulacion">
         <h2 id="titulo-simulacion">Caso base observado</h2>
         <p>

@@ -68,6 +68,17 @@ comparación muestra pacientes, pacientes que esperaron y Wq frente a los
 registros verificados, junto con su diferencia. También presenta las cifras
 exportadas, una tabla por paciente y una línea de tiempo por día y ventanilla.
 
+## Maqueta 3D
+
+La escena usa Three.js r160 desde `vendor/three/`. Por falta de fotos y medidas,
+se muestra el aviso permanente «Representación esquemática, no a escala»; la
+planta considera la entrada a la izquierda, las ventanillas al fondo y las
+filas al frente. Incluye zonas General y Preferencial delimitadas con espacio
+para 30 personas cada una, estantería instanciada y asientos. Los controles
+ofrecen vistas cenital, isométrica, frontal y «Ver fila», además de órbita con
+ratón o gestos táctiles. El render se limita a 30 fps y reduce resolución y
+sombras automáticamente al registrar 120 o más personas.
+
 Ejecuta todas las pruebas con:
 
 ```powershell

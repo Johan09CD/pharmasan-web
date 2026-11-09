@@ -3,7 +3,7 @@
 - [x] 1. Exportar datos
 - [x] 2. Implementar el motor
 - [x] 3. Crear el modo observados (selección de día/tramo, replay, cifras y vistas)
-- [ ] 4. Crear la escena 3D
+- [x] 4. Crear la escena 3D
 - [ ] 5. Añadir animación y HUD
 - [ ] 6. Crear el laboratorio
 - [ ] 7. Implementar réplicas y comparación

@@ -65,3 +65,13 @@
   el valor de diferencia en ámbar y una explicación. La tabla de pacientes y
   la línea de tiempo usan la salida de replay, con carriles separados por día
   y ventanilla. `data/observados.json` y los módulos del motor no se editan.
+- La maqueta 3D es esquemática, no a escala: no se recibieron fotos/medidas;
+  la distribución acordada ubica la puerta a la izquierda de las ventanillas
+  y la espera al frente. El mostrador queda al fondo, con V1/V2 General y V3
+  Adulto Mayor. Se reservan 30 marcas de fila por grupo, separadas por postes
+  y cintas, y 12 sillas fuera de las filas. Las cuatro vistas predefinidas
+  comparten OrbitControls; geometrías, materiales, estantería, postes, marcas y
+  sillas usan caché o instancing. El render se limita a 30 fps; a partir de
+  120 personas se reduce el pixel ratio y se desactivan sombras. No se animan
+  personas en esta fase. El rendimiento de 30 fps es el objetivo de diseño y
+  debe medirse en equipos de destino.
