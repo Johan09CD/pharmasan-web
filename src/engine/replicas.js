@@ -1,1 +1,196 @@
-export {};
+import { calcularMetricas } from "./metricas.js";
+import { simular } from "./simulador.js";
+
+function logGamma(valor) {
+  const coeficientes = [
+    676.5203681218851,
+    -1259.1392167224028,
+    771.3234287776531,
+    -176.6150291621406,
+    12.507343278686905,
+    -0.13857109526572012,
+    9.9843695780195716e-6,
+    1.5056327351493116e-7,
+  ];
+  let z = valor - 1;
+  let suma = 0.99999999999980993;
+  for (let indice = 0; indice < coeficientes.length; indice += 1) {
+    suma += coeficientes[indice] / (z + indice + 1);
+  }
+  const t = z + coeficientes.length - 0.5;
+  return (
+    0.9189385332046727 +
+    (z + 0.5) * Math.log(t) -
+    t +
+    Math.log(suma)
+  );
+}
+
+function fraccionContinuaBeta(a, b, x) {
+  const maxIteraciones = 200;
+  const tolerancia = 3e-14;
+  const minimo = 1e-300;
+  const suma = a + b;
+  const aMasUno = a + 1;
+  const aMenosUno = a - 1;
+  let c = 1;
+  let d = 1 - (suma * x) / aMasUno;
+  if (Math.abs(d) < minimo) {
+    d = minimo;
+  }
+  d = 1 / d;
+  let resultado = d;
+
+  for (let iteracion = 1; iteracion <= maxIteraciones; iteracion += 1) {
+    const dosIteracion = 2 * iteracion;
+    let coeficiente =
+      (iteracion * (b - iteracion) * x) /
+      ((aMenosUno + dosIteracion) * (a + dosIteracion));
+    d = 1 + coeficiente * d;
+    if (Math.abs(d) < minimo) {
+      d = minimo;
+    }
+    c = 1 + coeficiente / c;
+    if (Math.abs(c) < minimo) {
+      c = minimo;
+    }
+    d = 1 / d;
+    resultado *= d * c;
+
+    coeficiente =
+      (-(a + iteracion) * (suma + iteracion) * x) /
+      ((a + dosIteracion) * (aMasUno + dosIteracion));
+    d = 1 + coeficiente * d;
+    if (Math.abs(d) < minimo) {
+      d = minimo;
+    }
+    c = 1 + coeficiente / c;
+    if (Math.abs(c) < minimo) {
+      c = minimo;
+    }
+    d = 1 / d;
+    const cambio = d * c;
+    resultado *= cambio;
+    if (Math.abs(cambio - 1) < tolerancia) {
+      break;
+    }
+  }
+
+  return resultado;
+}
+
+function betaRegularizada(a, b, x) {
+  if (x <= 0) {
+    return 0;
+  }
+  if (x >= 1) {
+    return 1;
+  }
+  const factor = Math.exp(
+    logGamma(a + b) -
+      logGamma(a) -
+      logGamma(b) +
+      a * Math.log(x) +
+      b * Math.log1p(-x),
+  );
+  if (x < (a + 1) / (a + b + 2)) {
+    return (factor * fraccionContinuaBeta(a, b, x)) / a;
+  }
+  return 1 - (factor * fraccionContinuaBeta(b, a, 1 - x)) / b;
+}
+
+function distribucionT(valor, gradosLibertad) {
+  if (valor === 0) {
+    return 0.5;
+  }
+  const x = gradosLibertad / (gradosLibertad + valor * valor);
+  const cola = 0.5 * betaRegularizada(gradosLibertad / 2, 0.5, x);
+  return valor > 0 ? 1 - cola : cola;
+}
+
+export function valorCriticoT(gradosLibertad, nivel = 0.95) {
+  if (!Number.isInteger(gradosLibertad) || gradosLibertad < 1) {
+    throw new RangeError("Los grados de libertad deben ser un entero positivo.");
+  }
+  if (!Number.isFinite(nivel) || nivel <= 0 || nivel >= 1) {
+    throw new RangeError("El nivel de confianza debe estar entre cero y uno.");
+  }
+
+  const objetivo = (1 + nivel) / 2;
+  let inferior = 0;
+  let superior = 1;
+  while (distribucionT(superior, gradosLibertad) < objetivo) {
+    superior *= 2;
+  }
+  for (let iteracion = 0; iteracion < 80; iteracion += 1) {
+    const medio = (inferior + superior) / 2;
+    if (distribucionT(medio, gradosLibertad) < objetivo) {
+      inferior = medio;
+    } else {
+      superior = medio;
+    }
+  }
+  return (inferior + superior) / 2;
+}
+
+function aplanarMetricas(medidas) {
+  return {
+    n: medidas.n,
+    rho_global: medidas.rho_global,
+    Lq: medidas.Lq,
+    L: medidas.L,
+    Wq: medidas.Wq,
+    W: medidas.W,
+    P_esperar: medidas.P_esperar,
+    porcentaje_espera_mayor_tolerable: medidas.porcentaje_espera_mayor_tolerable,
+  };
+}
+
+export function correrReplicas(configuracion, cantidad, opciones = {}) {
+  if (!Number.isInteger(cantidad) || cantidad < 2) {
+    throw new RangeError("Se requieren al menos dos réplicas.");
+  }
+  if (!Number.isInteger(configuracion?.semilla)) {
+    throw new TypeError("La configuración requiere una semilla entera explícita.");
+  }
+
+  const semillas = [];
+  const valores = [];
+  for (let indice = 0; indice < cantidad; indice += 1) {
+    const semilla = configuracion.semilla + indice;
+    if (!Number.isSafeInteger(semilla)) {
+      throw new RangeError("La secuencia de semillas excede el rango seguro de enteros.");
+    }
+    semillas.push(semilla);
+    const resultado = simular({ ...configuracion, semilla });
+    valores.push(aplanarMetricas(calcularMetricas(resultado, opciones)));
+  }
+
+  const nombres = Object.keys(valores[0]);
+  const tCritico = valorCriticoT(cantidad - 1);
+  const resumen = Object.fromEntries(
+    nombres.map((nombre) => {
+      const muestra = valores.map((replica) => replica[nombre]);
+      const media = muestra.reduce((suma, valor) => suma + valor, 0) / cantidad;
+      const varianza =
+        muestra.reduce((suma, valor) => suma + (valor - media) ** 2, 0) /
+        (cantidad - 1);
+      const margen = tCritico * Math.sqrt(varianza / cantidad);
+      return [
+        nombre,
+        {
+          media,
+          desviacion: Math.sqrt(varianza),
+          ic95: { inferior: media - margen, superior: media + margen },
+        },
+      ];
+    }),
+  );
+
+  return {
+    cantidad,
+    semillas,
+    replicas: valores,
+    resumen,
+  };
+}

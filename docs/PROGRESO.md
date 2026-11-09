@@ -1,5 +1,20 @@
 # Progreso
 
+## 2026-11-09 — Motor de eventos discretos
+
+- **Hecho:** implementados PRNG Mulberry32 con flujos separados, montículo de
+  eventos, distribuciones, simulación de colas, métricas y réplicas con IC t de
+  Student; añadidas pruebas de reproducibilidad, teoría y replay observado.
+- **Archivos:** `src/engine/*.js` (6), `tests/*.js` (8), `README.md`,
+  `docs/PLAN.md`, `docs/DECISIONES.md` y `docs/PROGRESO.md`.
+- **Resultados:** `node --test`: 22 pruebas aprobadas, 0 fallidas; M/M/1 y M/M/2
+  dentro del IC 95 % para Wq y Lq; 131 llegadas reproducidas, 71 en pico,
+  Wq pico 0,155 min y 7 esperas. En 500 réplicas base, Wq=0,2570 min frente a
+  0,1535 min de referencia (diferencia 0,1034 min).
+- **Pendiente:** revisar la diferencia de llegadas entre los conteos uniformes
+  por intervalos de cinco minutos y el remuestreo de interllegadas Python; no
+  se ajustaron parámetros para forzar la coincidencia. Continuar fase 3.
+
 ## 2026-11-09 — Exportación de datos observados
 
 - **Hecho:** recibido desde `pharmasan-sim` el JSON con pacientes observados,

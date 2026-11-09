@@ -16,3 +16,14 @@
 - `data/observados.json` se genera en `pharmasan-sim` desde el CSV procesado y
   las tablas de análisis/escenarios existentes; la web consume ese artefacto
   sin mantener una copia manual de las cifras.
+- El calendario procesa `fin_servicio` antes que `llegada` en empates; las
+  réplicas usan Mulberry32 y flujos separados para llegadas, servicio por grupo
+  y asignación de ventanillas.
+- `conteos` elige un día entre los registros observados disponibles y genera
+  tiempos dentro de cada intervalo de cinco minutos. `replay` puede reproducir
+  horarios y ventanillas observados si se activa esa opción explícitamente.
+- En la comparación de 500 réplicas base, Wq fue 0,2570 min frente a 0,1535 min
+  en `referencia_python.base` (diferencia 0,1034 min). Se conserva la
+  parametrización solicitada: la causa probable es generar llegadas uniformes
+  por conteos de cinco minutos en lugar de remuestrear interllegadas empíricas
+  como hace el simulador Python.
