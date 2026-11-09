@@ -1,5 +1,20 @@
 # Progreso
 
+## 2026-11-09 — Simulación observada y comparación Python en la interfaz
+
+- **Hecho:** conectado el botón «Volver a simular con las llegadas observadas»
+  a `crearConfiguracionBase(datos)` y a 500 réplicas. El panel compara el Wq
+  promedio con la referencia base exportada y resalta en verde los resultados
+  dentro de su IC 95 %. No se usaron los 68 intervalos globales ni se modificó
+  `data/observados.json`.
+- **Archivos:** `index.html`, `src/ui/app.js`, `src/ui/estilos.css`,
+  `README.md`, `docs/PLAN.md`, `docs/PROGRESO.md` y `docs/DECISIONES.md`.
+- **Resultados:** semillas 20261101–20261600; Wq simulado **0,152560 min**,
+  referencia Python **0,153536 min**, IC 95 % **[0,137024; 0,170048] min**.
+  La interfaz mostró «Dentro del IC 95 % de Python». `node --test`: **24
+  pruebas aprobadas, 0 fallidas**; sintaxis JS y `git diff --check` correctos.
+- **Pendiente:** fase 4, crear la escena 3D.
+
 ## 2026-11-09 — Sincronización de intervalos de confianza de Wq
 
 - **Hecho:** actualizado `data/observados.json` desde el exportador del

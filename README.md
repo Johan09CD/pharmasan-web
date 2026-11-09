@@ -21,7 +21,7 @@ desde archivos locales.
 - `src/engine/`: módulos del motor.
 - `src/escena/`: módulos de la escena 3D.
 - `src/ui/`: interfaz.
-- `data/observados.json`: datos que se exportarán en una fase posterior.
+- `data/observados.json`: datos y referencias exportados desde `pharmasan-sim`.
 - `vendor/three/`: dependencias locales con versiones fijas.
 - `tests/`: pruebas del motor con `node --test`.
 - `docs/`: progreso, decisiones y fases del proyecto.
@@ -53,6 +53,12 @@ de cada grupo y día, usa los ajustes Erlang exportados, asignación aleatoria y
 horizonte de 60 minutos. El muestreo uniforme dentro de los conteos sigue
 disponible mediante `modo: "conteos_uniformes"` (también se acepta el alias
 anterior `modo: "conteos"`).
+
+En la interfaz, «Volver a simular con las llegadas observadas» ejecuta 500
+réplicas del caso base. El panel compara el Wq medio con la referencia base de
+Python y muestra en verde si cae dentro del IC 95 % exportado. La primera tanda
+usa la semilla exportada y las siguientes tandas continúan con bloques de 500
+semillas consecutivas.
 
 Ejecuta todas las pruebas con:
 

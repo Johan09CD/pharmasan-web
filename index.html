@@ -7,9 +7,52 @@
     <link rel="stylesheet" href="src/ui/estilos.css">
   </head>
   <body>
-    <main>
-      <h1>Pharmasan</h1>
-      <p id="estado" role="status">Cargando aplicación…</p>
+    <main class="aplicacion">
+      <header class="encabezado">
+        <p class="etiqueta">Droguería Pharmasan · Bochalema</p>
+        <h1>Simulación de atención</h1>
+        <p class="introduccion">
+          Repite el caso base con las interllegadas observadas, remuestreadas
+          por separado para cada grupo y día.
+        </p>
+      </header>
+
+      <section class="panel" aria-labelledby="titulo-simulacion">
+        <h2 id="titulo-simulacion">Caso base observado</h2>
+        <p>
+          El servicio usa los ajustes Erlang exportados y la asignación aleatoria
+          entre ventanillas libres.
+        </p>
+        <button id="simular-observados" type="button" disabled>
+          Volver a simular con las llegadas observadas
+        </button>
+        <p id="estado" class="estado" role="status" aria-live="polite">
+          Cargando datos observados…
+        </p>
+      </section>
+
+      <section id="resultados" class="panel panel-resultados" aria-labelledby="titulo-resultados" hidden>
+        <h2 id="titulo-resultados">Comparación del caso base</h2>
+        <p class="nota-resultados">
+          Wq es el promedio de 500 réplicas. La semilla inicial se deriva de la
+          exportación de datos.
+        </p>
+        <dl class="medidas">
+          <div>
+            <dt>Wq simulado</dt>
+            <dd id="wq-simulado">—</dd>
+          </div>
+          <div>
+            <dt>Wq referencia Python</dt>
+            <dd id="wq-referencia">—</dd>
+          </div>
+          <div>
+            <dt>IC 95 % Python</dt>
+            <dd id="ic-referencia">—</dd>
+          </div>
+        </dl>
+        <p id="comparacion" class="comparacion" role="status" aria-live="polite"></p>
+      </section>
     </main>
     <script type="module" src="src/ui/app.js"></script>
   </body>

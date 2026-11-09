@@ -47,3 +47,10 @@
   provienen de `wq_media_ic95_inferior` y `wq_media_ic95_superior` en
   `pharmasan-sim/outputs/tablas/escenarios.csv`; el exportador Python es la
   única fuente del JSON y no se mantienen valores manuales.
+- El modo «Volver a simular con las llegadas observadas» construye cada tanda
+  con `crearConfiguracionBase(datos)` y corre 500 réplicas; no usa los 68
+  intervalos globales. La primera tanda parte de `meta.semilla_usada` y cada
+  nueva tanda avanza 500 semillas. El panel compara el promedio Wq con el
+  escenario base de `referencia_python.escenarios` y sus límites exportados
+  `wq_ic95_inferior`/`wq_ic95_superior`; solo el resultado dentro del intervalo
+  se marca en verde. No se editaron manualmente los datos exportados.

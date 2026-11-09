@@ -2,7 +2,7 @@
 
 - [x] 1. Exportar datos
 - [x] 2. Implementar el motor
-- [ ] 3. Crear el modo observados
+- [x] 3. Crear el modo observados
 - [ ] 4. Crear la escena 3D
 - [ ] 5. Añadir animación y HUD
 - [ ] 6. Crear el laboratorio
