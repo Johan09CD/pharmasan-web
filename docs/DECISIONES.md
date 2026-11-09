@@ -11,3 +11,5 @@
   módulo del motor cuando se implemente.
 - El plan define nueve fases ordenadas; el despliegue de GitHub Pages queda para
   la última fase.
+- El archivo `.github/workflows/pages.yml` se mantiene como marcador sin
+  configuración hasta la fase de despliegue.
