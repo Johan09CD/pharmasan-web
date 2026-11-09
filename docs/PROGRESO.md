@@ -1,5 +1,36 @@
 # Progreso
 
+## 2026-11-09 — Diagnóstico y corrección del caso base
+
+- **Hecho:** trazada la implementación Python; aisladas las hipótesis de
+  llegadas y asignación con 500 réplicas; añadido un constructor de caso base
+  por grupo y una prueba estricta contra el IC 95 % Python. Se conservó la
+  alternativa de conteos uniformes como `conteos_uniformes`.
+- **Archivos:** `src/ui/observados.js`, `src/engine/simulador.js`,
+  `tests/diagnostico_base.test.js`, `tests/simulador.test.js`,
+  `data/observados.json`, `README.md`, `docs/DECISIONES.md` y
+  `docs/PROGRESO.md`.
+- **Resultados:** semillas 20261101–20261600, Erlang ajustado y horizonte de
+  60 min en todas las variantes. Wq: uniforme + primera libre **0,256980**;
+  uniforme + aleatoria **0,256980**; 68 intervalos globales + aleatoria
+  **0,874050**; interllegadas Python por grupo (44 General, 21 Preferencial) +
+  primera libre **0,152560**; misma configuración + aleatoria **0,152560**.
+  Python: media **0,153536**, IC 95 % **[0,137024; 0,170048]**. La causa es
+  remuestrear intervalos globales mezclados/uniformes en lugar de los conjuntos
+  empíricos positivos independientes por grupo y día; la asignación no explica
+  la diferencia observada. `node --test`: **24 pruebas aprobadas, 0 fallidas**.
+- **Pendiente:** continuar la fase 3. La prueba comparativa usa el intervalo
+  Python exportado y exige que la media JS de 500 réplicas caiga dentro de él.
+
+| Variante (500 réplicas) | Wq medio (min) |
+|---|---:|
+| Conteos uniformes, primera libre | 0,256980 |
+| Conteos uniformes, aleatoria | 0,256980 |
+| 68 intervalos mezclados, aleatoria | 0,874050 |
+| Interllegadas por grupo Python (44 G + 21 P), primera libre | 0,152560 |
+| Interllegadas por grupo Python (44 G + 21 P), aleatoria | 0,152560 |
+| Referencia Python (IC 95 %) | 0,153536 [0,137024; 0,170048] |
+
 ## 2026-11-09 — Motor de eventos discretos
 
 - **Hecho:** implementados PRNG Mulberry32 con flujos separados, montículo de

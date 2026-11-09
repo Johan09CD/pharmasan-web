@@ -22,8 +22,24 @@
 - `conteos` elige un día entre los registros observados disponibles y genera
   tiempos dentro de cada intervalo de cinco minutos. `replay` puede reproducir
   horarios y ventanillas observados si se activa esa opción explícitamente.
-- En la comparación de 500 réplicas base, Wq fue 0,2570 min frente a 0,1535 min
-  en `referencia_python.base` (diferencia 0,1034 min). Se conserva la
-  parametrización solicitada: la causa probable es generar llegadas uniformes
-  por conteos de cinco minutos en lugar de remuestrear interllegadas empíricas
-  como hace el simulador Python.
+- El caso base del simulador Python remuestrea interllegadas positivas por tipo
+  y día, usa servicios Erlang, horizonte de 60 min y la regla de asignación
+  elegida por `ejecutar_experimentos`. La fila exportada del escenario base
+  confirma 500 réplicas y asignación `aleatoria`.
+- El caso base web reproduce la generación de interllegadas Python a partir de
+  pacientes pico, separadas por grupo y día; no remuestrea los 68 intervalos
+  globales mezclados (incluyen un intervalo cero y saltos entre grupos que
+  Python excluye). Los ajustes Erlang y el horizonte proceden de los datos y el
+  código Python. `conteos_uniformes` se conserva como alternativa explícita.
+- En las pruebas de 500 réplicas con semillas 20261101–20261600, Wq fue
+  0,256980 min para llegadas uniformes, 0,874050 min para los 68 intervalos
+  globales mezclados y 0,152560 min para interllegadas separadas por grupo.
+  Cambiar `primera_libre` por `aleatoria` no cambió Wq en estas corridas. La
+  referencia Python es 0,153536 min con IC 95 % [0,137024; 0,170048] min.
+  La diferencia se explica por la estructura de llegadas por grupo, no por el
+  servicio ni por la asignación.
+- Evidencia del código Python: `pharmasan-sim/src/pharmasan_sim/simulador.py`
+  (generación empírica por grupo y día, Erlang, horizonte y despacho) y
+  `pharmasan-sim/src/pharmasan_sim/experimentos.py` (selección de la regla de
+  asignación). La media y el IC Python se contrastaron además ejecutando 500
+  réplicas sin guardar archivos y coinciden con `outputs/tablas/escenarios.csv`.

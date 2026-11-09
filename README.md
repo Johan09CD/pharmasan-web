@@ -47,6 +47,13 @@ espera y permanencia, probabilidad de esperar y evaluación del criterio de
 servicio. Las réplicas usan semillas consecutivas e intervalos t de Student
 bilaterales del 95 %.
 
+`crearConfiguracionBase(datos)` en `src/ui/observados.js` crea el caso base
+desde los datos observados: remuestrea por separado las interllegadas positivas
+de cada grupo y día, usa los ajustes Erlang exportados, asignación aleatoria y
+horizonte de 60 minutos. El muestreo uniforme dentro de los conteos sigue
+disponible mediante `modo: "conteos_uniformes"` (también se acepta el alias
+anterior `modo: "conteos"`).
+
 Ejecuta todas las pruebas con:
 
 ```powershell

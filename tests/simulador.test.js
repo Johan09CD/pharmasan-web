@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { calcularMetricas } from "../src/engine/metricas.js";
 import { simular } from "../src/engine/simulador.js";
+import { crearConfiguracionBase } from "../src/ui/observados.js";
 
 function configuracionBase(llegadas, cambios = {}) {
   return {
@@ -217,44 +218,56 @@ test("la configuración base de 500 réplicas se contrasta con referencia_python
   const referencia = datos.referencia_python.escenarios.find(
     (escenario) => escenario.escenario === "base",
   );
-  const resultado = await import("../src/engine/replicas.js");
-  const resumen = resultado.correrReplicas(
-    {
-      ventanillas: [
-        { id: 1, nombre: "V1", atiende: ["General"] },
-        { id: 2, nombre: "V2", atiende: ["General"] },
-        { id: 3, nombre: "V3", atiende: ["Preferencial"] },
-      ],
-      llegadas: { modo: "conteos", intervalos: datos.llegadas.conteos_5_min },
-      atencion: Object.fromEntries(
-        Object.entries(datos.atencion).map(([tipo, valores]) => [
-          tipo,
-          {
-            dist: "erlang",
-            media: valores.erlang.forma / valores.erlang.tasa,
-            k: valores.erlang.forma,
-          },
-        ]),
-      ),
-      disciplina: "FIFO",
-      colas: "separadas",
-      asignacion_libres: "primera_libre",
-      horizonte_min: 60,
-      semilla: 20261101,
-    },
-    500,
-  );
-  const diferencia = Math.abs(resumen.resumen.Wq.media - referencia.wq_min);
+  const { correrReplicas } = await import("../src/engine/replicas.js");
+  const configuracion = crearConfiguracionBase(datos);
+  const resumen = correrReplicas(configuracion, 500);
+
   assert.equal(resumen.semillas.length, 500);
-  assert.ok(Number.isFinite(resumen.resumen.Wq.media));
-  if (diferencia > 0.1) {
-    console.warn(
-      `La media Wq de conteos observados (${resumen.resumen.Wq.media.toFixed(4)} min) ` +
-        `difiere ${diferencia.toFixed(4)} min de referencia_python.base ` +
-        `(${referencia.wq_min.toFixed(4)} min). Causa probable: conteos uniformes ` +
-        "por intervalo de 5 min frente al remuestreo de interllegadas empíricas de Python.",
+  assert.equal(configuracion.asignacion_libres, "aleatoria");
+  assert.equal(configuracion.llegadas.modo, "intervalos");
+  assert.equal(configuracion.llegadas.tiempos_entre_llegadas.General.length, 44);
+  assert.equal(
+    configuracion.llegadas.tiempos_entre_llegadas.Preferencial.length,
+    21,
+  );
+  assert.equal(configuracion.atencion.General.k, datos.atencion.General.erlang.forma);
+  assert.equal(
+    configuracion.atencion.Preferencial.k,
+    datos.atencion.Preferencial.erlang.forma,
+  );
+  for (const tipo of ["General", "Preferencial"]) {
+    assert.equal(configuracion.atencion[tipo].dist, "erlang");
+    assert.equal(
+      configuracion.atencion[tipo].media,
+      datos.atencion[tipo].erlang.forma / datos.atencion[tipo].erlang.tasa,
     );
   }
+  assert.ok(
+    resumen.resumen.Wq.media >= referencia.wq_ic95_inferior &&
+      resumen.resumen.Wq.media <= referencia.wq_ic95_superior,
+    `Wq base=${resumen.resumen.Wq.media}; IC Python=[${referencia.wq_ic95_inferior}, ${referencia.wq_ic95_superior}]`,
+  );
+});
+
+test("las llegadas uniformes de conteos siguen disponibles con nombre explícito", () => {
+  const resultado = simular(
+    configuracionBase(
+      {
+        modo: "conteos_uniformes",
+        dia: "Lunes",
+        intervalos: [
+          { dia: "Lunes", tipo: "General", inicio_min: 0, fin_min: 5, llegadas: 3 },
+        ],
+      },
+      { horizonte_min: 5 },
+    ),
+  );
+  assert.equal(resultado.pacientes.length, 3);
+  assert.ok(
+    resultado.pacientes.every(
+      (paciente) => paciente.llegada >= 0 && paciente.llegada < 5,
+    ),
+  );
 });
 
 test("conteo de cola y compatibilidad de ventanillas compartidas", () => {

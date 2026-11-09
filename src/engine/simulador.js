@@ -114,7 +114,7 @@ function crearLlegadas(configuracion, aleatorio) {
       _orden: indice,
       _registro: registro,
     }));
-  } else if (modo === "conteos") {
+  } else if (modo === "conteos" || modo === "conteos_uniformes") {
     llegadas = crearLlegadasPorConteos(parametros, aleatorio);
   } else if (modo === "poisson") {
     llegadas = crearLlegadasPoisson(parametros, configuracion, aleatorio);
@@ -266,6 +266,35 @@ function crearLlegadasPorIntervalos(parametros, configuracion, aleatorio) {
           }
         : { ...paciente, llegada: paciente.llegada ?? paciente.llegada_min, _orden: indice },
     );
+  }
+
+  if (Array.isArray(parametros.intervalos_min)) {
+    const intervalos = parametros.intervalos_min;
+    if (
+      intervalos.length === 0 ||
+      intervalos.some((valor) => !Number.isFinite(valor) || valor < 0) ||
+      !intervalos.some((valor) => valor > 0)
+    ) {
+      throw new RangeError(
+        "Los intervalos globales deben ser finitos, no negativos y contener alguno positivo.",
+      );
+    }
+    const limite = configuracion.horizonte_min ?? Infinity;
+    const cantidad = configuracion.cantidad_pacientes ?? Infinity;
+    const pacientes = [];
+    let tiempo = 0;
+    while (pacientes.length < cantidad) {
+      tiempo += intervalos[Math.floor(aleatorio() * intervalos.length)];
+      if (tiempo >= limite) {
+        break;
+      }
+      pacientes.push({
+        tipo: tipoAleatorio(parametros, aleatorio),
+        llegada: tiempo,
+        _orden: pacientes.length,
+      });
+    }
+    return pacientes;
   }
 
   const valores =
