@@ -11,26 +11,45 @@
   box-sizing: border-box;
 }
 
+html,
 body {
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
   margin: 0;
-  min-width: 320px;
+  overflow-x: clip;
+}
+
+body {
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .aplicacion {
-  width: min(100% - 2rem, 760px);
-  margin: 0 auto;
-  padding: clamp(2rem, 7vw, 5rem) 0;
+  display: grid;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  padding: 0.75rem;
+  grid-template-columns: minmax(0, 1fr) minmax(330px, 370px);
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0.65rem;
+  overflow: hidden;
 }
 
 .encabezado {
-  margin-bottom: 2rem;
+  min-width: 0;
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  padding-inline: 0.5rem;
 }
 
 .etiqueta {
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.15rem;
   color: #38745b;
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -38,81 +57,125 @@ body {
 
 h1,
 h2,
+h3,
 p {
   margin-top: 0;
 }
 
 h1 {
-  margin-bottom: 0.75rem;
-  font-size: clamp(2rem, 5vw, 3rem);
+  margin-bottom: 0;
+  font-size: clamp(1.45rem, 2.2vw, 2rem);
   line-height: 1.1;
 }
 
 h2 {
   margin-bottom: 0.5rem;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
 }
 
-.introduccion,
-.panel > p,
-.nota-resultados {
+h3 {
+  margin: 1.1rem 0 0.5rem;
+  font-size: 1rem;
+}
+
+.nota-resultados,
+.panel > p {
   color: #496258;
-  line-height: 1.6;
+  line-height: 1.45;
 }
 
 .panel {
-  margin-top: 1.25rem;
-  padding: clamp(1.25rem, 4vw, 2rem);
+  min-width: 0;
+  margin: 0;
+  padding: 1rem;
   border: 1px solid #d5e2d9;
-  border-radius: 1rem;
+  border-radius: 0.85rem;
   background: #fff;
-  box-shadow: 0 0.5rem 1.75rem rgb(24 53 43 / 6%);
+  box-shadow: 0 0.4rem 1.2rem rgb(24 53 43 / 6%);
 }
 
 .panel-escena {
-  padding: clamp(0.9rem, 3vw, 1.5rem);
+  display: flex;
+  min-height: 0;
+  padding: 0.75rem;
+  flex-direction: column;
+  grid-column: 1;
+  grid-row: 2;
 }
 
 .cabecera-escena {
   display: flex;
+  min-width: 0;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 1rem;
+  gap: 0.5rem;
   flex-wrap: wrap;
 }
 
 .cabecera-escena h2 {
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.15rem;
 }
 
 .cabecera-escena .nota-resultados {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.82rem;
 }
 
 .marca-esquematica {
   display: inline-flex;
-  padding: 0.45rem 0.7rem;
+  max-width: 100%;
+  padding: 0.35rem 0.55rem;
   border: 1px solid #d6bd88;
   border-radius: 999px;
   background: #fff8e9;
   color: #725922;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 700;
 }
 
 .controles-vista {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 0.5rem 0 0.75rem;
+  gap: 0.4rem;
+  margin: 0.3rem 0 0.5rem;
+}
+
+button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.55rem 0.8rem;
+  border: 0;
+  border-radius: 0.55rem;
+  background: #206344;
+  color: #fff;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+button:hover:enabled {
+  background: #174b33;
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+summary:focus-visible {
+  outline: 3px solid #92c8a9;
+  outline-offset: 2px;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.65;
 }
 
 .controles-vista button {
-  min-height: 2.35rem;
-  padding: 0.45rem 0.75rem;
+  min-height: 40px;
+  padding: 0.35rem 0.6rem;
   background: #e8efea;
   color: #214d39;
-  font-size: 0.88rem;
+  font-size: 0.82rem;
 }
 
 .controles-vista button:hover:enabled,
@@ -121,13 +184,20 @@ h2 {
   color: #fff;
 }
 
+kbd {
+  margin-left: 0.2rem;
+  font: inherit;
+  opacity: 0.7;
+}
+
 .escena-local {
   position: relative;
-  height: clamp(390px, 62vh, 760px);
-  min-height: 360px;
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
   overflow: hidden;
   border: 1px solid #cbd9d1;
-  border-radius: 0.75rem;
+  border-radius: 0.7rem;
   background:
     radial-gradient(ellipse at 50% 30%, rgb(255 255 255 / 78%), transparent 58%),
     linear-gradient(180deg, #c9dfe1 0%, #e6ece9 55%, #cbd9d1 100%);
@@ -142,80 +212,23 @@ h2 {
 
 .escena-local[data-calidad="reducida"]::after {
   position: absolute;
-  right: 0.65rem;
-  bottom: 0.65rem;
-  padding: 0.3rem 0.55rem;
+  right: 0.55rem;
+  bottom: 0.55rem;
+  padding: 0.3rem 0.5rem;
   border-radius: 0.3rem;
   background: rgb(24 53 43 / 78%);
   color: #fff;
   content: "Calidad reducida";
-  font-size: 0.75rem;
-}
-
-button {
-  min-height: 2.75rem;
-  padding: 0.7rem 1rem;
-  border: 0;
-  border-radius: 0.55rem;
-  background: #206344;
-  color: #fff;
-  font: inherit;
-  font-weight: 650;
-  cursor: pointer;
-}
-
-button:hover:enabled {
-  background: #174b33;
-}
-
-button:focus-visible {
-  outline: 3px solid #92c8a9;
-  outline-offset: 3px;
-}
-
-button:disabled {
-  cursor: wait;
-  opacity: 0.65;
-}
-
-.controles-replay {
-  display: grid;
-  grid-template-columns: auto minmax(180px, 1fr);
-  gap: 0.75rem 1rem;
-  align-items: center;
-  max-width: 480px;
-  margin: 1.25rem 0;
-}
-
-.controles-replay label {
-  font-weight: 650;
-}
-
-.controles-replay select {
-  min-height: 2.5rem;
-  padding: 0.4rem 0.65rem;
-  border: 1px solid #afc5b7;
-  border-radius: 0.45rem;
-  background: #fff;
-  color: inherit;
-  font: inherit;
-}
-
-.controles-replay select:focus-visible {
-  outline: 3px solid #92c8a9;
-  outline-offset: 2px;
-}
-
-.ayuda {
-  max-width: 68ch;
-  font-size: 0.9rem;
+  font-size: 0.72rem;
+  pointer-events: none;
 }
 
 .estado {
-  min-height: 1.5em;
-  margin: 1rem 0 0;
+  min-height: 1.3em;
+  margin: 0.45rem 0 0;
   color: #496258;
-  line-height: 1.5;
+  font-size: 0.82rem;
+  line-height: 1.4;
 }
 
 .estado-correcto {
@@ -226,40 +239,174 @@ button:disabled {
   color: #a32121;
 }
 
-.nota-resultados {
-  margin-bottom: 1.25rem;
-  font-size: 0.925rem;
+.barra-lateral {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  gap: 0.65rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.barra-lateral .panel {
+  padding: 0.9rem;
+}
+
+.barra-lateral .panel > p {
+  margin-bottom: 0.6rem;
+  font-size: 0.86rem;
+}
+
+.panel-hud h2 {
+  margin-bottom: 0.55rem;
+}
+
+.hud-esencial,
+.medidas-hud {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin: 0;
+}
+
+.hud-esencial > div,
+.medidas-hud > div {
+  min-width: 0;
+  padding: 0.5rem 0.6rem;
+  border-radius: 0.55rem;
+  background: #f3f7f4;
+}
+
+.hud-esencial > div:first-child {
+  grid-column: 1 / -1;
+}
+
+.hud-esencial dt,
+.medidas-hud dt,
+.medidas dt {
+  color: #496258;
+  font-size: 0.72rem;
+}
+
+.hud-esencial dd,
+.medidas-hud dd,
+.medidas dd {
+  margin: 0.12rem 0 0;
+  font-size: 1rem;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+
+.controles-reproduccion {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  gap: 0.45rem;
+  margin: 0.65rem 0 0.3rem;
+}
+
+.controles-reproduccion button {
+  min-height: 44px;
+}
+
+.barra-tiempo {
+  display: block;
+  width: 100%;
+  min-height: 28px;
+  margin: 0.2rem 0;
+  accent-color: #27664b;
+}
+
+.ayuda {
+  margin: 0.35rem 0 0;
+  color: #496258;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.hud-detalles,
+.ayuda-plegable {
+  margin-top: 0.55rem;
+  font-size: 0.82rem;
+}
+
+summary {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  color: #206344;
+  cursor: pointer;
+  font-weight: 650;
+}
+
+.controles-replay {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  gap: 0.4rem 0.55rem;
+  align-items: center;
+  margin: 0.55rem 0;
+}
+
+.controles-replay label {
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+
+.controles-replay select {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0.45rem;
+  border: 1px solid #afc5b7;
+  border-radius: 0.45rem;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-size: 0.82rem;
+}
+
+#reproducir-observado,
+#simular-observados {
+  width: 100%;
+  font-size: 0.88rem;
+}
+
+.ayuda-plegable p {
+  margin: 0 0 0.55rem;
+}
+
+.resultados-base[hidden],
+.panel-resultados[hidden] {
+  display: none;
 }
 
 .medidas {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
   margin: 0;
 }
 
-.medidas div {
-  padding: 1rem;
-  border-radius: 0.7rem;
+.medidas > div {
+  min-width: 0;
+  padding: 0.55rem;
+  border-radius: 0.55rem;
   background: #f3f7f4;
 }
 
-.medidas dt {
-  color: #496258;
-  font-size: 0.85rem;
-}
-
 .medidas dd {
-  margin: 0.35rem 0 0;
-  font-size: 1.2rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
 }
 
 .comparacion {
-  margin: 1rem 0 0;
-  padding: 0.8rem 1rem;
-  border-radius: 0.6rem;
+  margin: 0.55rem 0 0;
+  padding: 0.6rem 0.7rem;
+  border-radius: 0.55rem;
+  font-size: 0.82rem;
   font-weight: 700;
 }
 
@@ -279,21 +426,22 @@ button:disabled {
 }
 
 .tabla-desplazable {
+  max-width: 100%;
   overflow-x: auto;
-  margin: 1rem 0;
+  margin: 0.7rem 0;
   border: 1px solid #d5e2d9;
-  border-radius: 0.65rem;
+  border-radius: 0.55rem;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  font-size: 0.78rem;
   text-align: left;
 }
 
 caption {
-  padding: 0.75rem 1rem;
+  padding: 0.6rem;
   color: #496258;
   font-weight: 650;
   text-align: left;
@@ -301,14 +449,14 @@ caption {
 
 th,
 td {
-  padding: 0.65rem 0.75rem;
+  padding: 0.5rem;
   border-top: 1px solid #e4ece7;
   white-space: nowrap;
 }
 
 th {
   background: #f3f7f4;
-  font-size: 0.82rem;
+  font-size: 0.74rem;
 }
 
 td small {
@@ -319,56 +467,53 @@ td small {
 }
 
 .cifras-completas {
-  margin: 1.25rem 0 2rem;
-}
-
-.cifras-completas summary {
-  color: #206344;
-  cursor: pointer;
-  font-weight: 650;
+  margin: 0.75rem 0 1.2rem;
 }
 
 .cifras-completas dl {
   display: grid;
-  grid-template-columns: minmax(180px, 0.8fr) minmax(0, 1.2fr);
-  gap: 0;
-  margin: 0.75rem 0;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  margin: 0.5rem 0;
 }
 
 .cifras-completas dt,
 .cifras-completas dd {
+  min-width: 0;
   margin: 0;
-  padding: 0.6rem 0.75rem;
+  padding: 0.45rem;
   border-bottom: 1px solid #e4ece7;
+  overflow-wrap: anywhere;
 }
 
 .cifras-completas dt {
+  font-size: 0.78rem;
   font-weight: 650;
 }
 
 .linea-tiempo {
   display: grid;
-  gap: 0.6rem;
+  max-width: 100%;
+  gap: 0.5rem;
   overflow-x: auto;
 }
 
 .carril-tiempo {
   display: grid;
-  grid-template-columns: minmax(130px, 0.3fr) minmax(300px, 1fr);
-  gap: 0.75rem;
+  min-width: 300px;
+  grid-template-columns: minmax(90px, 0.3fr) minmax(160px, 1fr);
+  gap: 0.5rem;
   align-items: center;
-  min-width: 480px;
 }
 
 .nombre-carril {
   color: #496258;
-  font-size: 0.85rem;
+  font-size: 0.74rem;
   font-weight: 650;
 }
 
 .pista-tiempo {
   position: relative;
-  min-height: 2.1rem;
+  min-height: 2rem;
   border-bottom: 1px solid #b9cbbf;
   background-image: linear-gradient(to right, #e8efea 1px, transparent 1px);
   background-size: 25% 100%;
@@ -378,22 +523,157 @@ td small {
   position: absolute;
   top: 0.35rem;
   min-width: 2px;
-  height: 1.25rem;
+  height: 1.2rem;
   overflow: hidden;
   border-radius: 0.25rem;
   background: #397c58;
   color: #fff;
   font-size: 0.65rem;
-  line-height: 1.25rem;
+  line-height: 1.2rem;
   text-align: center;
 }
 
 .eje-tiempo {
   display: flex;
+  min-width: 300px;
   justify-content: space-between;
-  margin: 0.35rem 0 0 calc(min(30%, 142px) + 0.75rem);
+  margin-left: 30%;
   color: #496258;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
+}
+
+.solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (min-width: 1280px) {
+  .barra-lateral {
+    position: relative;
+    align-self: stretch;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1279px) {
+  .aplicacion {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 340px);
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .panel-escena {
+    padding: 0.6rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .aplicacion {
+    display: flex;
+    width: 100%;
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 0.5rem;
+    flex-direction: column;
+    gap: 0.55rem;
+    overflow: visible;
+  }
+
+  .encabezado {
+    order: 0;
+    padding: 0.35rem 0.25rem;
+  }
+
+  h1 {
+    font-size: 1.55rem;
+  }
+
+  .panel-escena {
+    width: 100%;
+    min-height: 0;
+    padding: 0.6rem;
+    order: 1;
+  }
+
+  .cabecera-escena {
+    gap: 0.25rem;
+  }
+
+  .marca-esquematica {
+    font-size: 0.68rem;
+  }
+
+  .controles-vista {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.4rem;
+    margin: 0.4rem 0;
+  }
+
+  .controles-vista button {
+    min-height: 44px;
+    padding: 0.35rem;
+  }
+
+  .escena-local {
+    width: 100%;
+    height: 45vh;
+    height: 45svh;
+    min-height: 240px;
+    max-height: 380px;
+    flex: none;
+  }
+
+  .barra-lateral {
+    display: flex;
+    width: 100%;
+    min-height: 0;
+    order: 2;
+    overflow: visible;
+  }
+
+  .barra-lateral .panel {
+    width: 100%;
+  }
+
+  .panel-hud {
+    order: 0;
+  }
+
+  .panel-hud .hud-esencial {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .hud-esencial > div:first-child {
+    grid-column: auto;
+  }
+
+  .panel-hud .controles-reproduccion {
+    grid-template-columns: 52px minmax(0, 1fr) 52px;
+  }
+
+  .panel-hud .controles-reproduccion button {
+    min-height: 48px;
+  }
+
+  .controles-replay {
+    grid-template-columns: 4rem minmax(0, 1fr);
+  }
+
+  .panel-resultados {
+    order: 3;
+  }
+
+  .carril-tiempo {
+    min-width: 300px;
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -404,28 +684,12 @@ td small {
   @keyframes aparecer {
     from {
       opacity: 0;
-      transform: translateY(0.35rem);
+      transform: translateY(0.25rem);
     }
 
     to {
       opacity: 1;
       transform: translateY(0);
-    }
-  }
-
-  @media (max-width: 560px) {
-    .aplicacion {
-      width: min(100% - 1rem, 760px);
-      padding-top: 1.5rem;
-    }
-
-    .escena-local {
-      height: 54vh;
-      min-height: 360px;
-    }
-
-    .controles-vista button {
-      flex: 1 1 calc(50% - 0.5rem);
     }
   }
 }

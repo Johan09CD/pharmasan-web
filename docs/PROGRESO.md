@@ -1,5 +1,27 @@
 # Progreso
 
+## 2026-11-09 — Diseño adaptable prioritario para PC y controles HUD
+
+- **Hecho:** reorganizada la página para usar una escena amplia y columna
+  lateral fija desde 1280 px; en móvil la escena va primero y ocupa 45 svh,
+  seguida por controles/HUD apilados. El HUD compacto presenta reloj, llegados,
+  atendidos, filas y Wq; las métricas secundarias quedan plegadas. Añadidos
+  controles de reproducción/pausa, saltos y barra temporal, con atajos espacio,
+  flechas y 1/2/3 para vistas. En ancho móvil la escena reduce automáticamente
+  resolución y desactiva sombras, independiente de la cantidad de personas.
+- **Archivos:** `index.html`, `src/ui/estilos.css`, `src/ui/app.js`,
+  `src/escena/local3d.js`, `docs/PLAN.md`, `docs/PROGRESO.md` y
+  `docs/DECISIONES.md`.
+- **Resultados Playwright:** 1366×768: escena **936×528 px**, columna lateral
+  **370 px**, control de carga visible, sin scroll de página ni desbordamiento
+  horizontal; la escena y la columna no se superponen. 390×844: canvas
+  **336×378 px** (45 svh), HUD debajo de la escena, calidad reducida activa,
+  botones desde **44 px**, scroll horizontal **no**. Se verificaron la carga
+  de reproducción, actualización del HUD, pausa/continuación, salto con flecha
+  y vista cenital con tecla 1. `node --test`: **32 aprobadas, 0 fallidas**.
+- **Pendiente:** fase 5 sigue abierta para animación de pacientes, que no se
+  implementa en esta tarea.
+
 ## 2026-11-09 — Maqueta arquitectónica 3D del local
 
 - **Hecho:** solicitadas fotos/medidas y distribución antes de modelar. El

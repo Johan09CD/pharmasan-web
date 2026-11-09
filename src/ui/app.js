@@ -29,6 +29,21 @@ const estadoComparacion = document.querySelector("#estado-comparacion");
 const lineaTiempo = document.querySelector("#linea-tiempo");
 const contenedorEscena = document.querySelector("#escena-local");
 const estadoEscena = document.querySelector("#estado-escena");
+const hud = {
+  reloj: document.querySelector("#hud-reloj"),
+  llegados: document.querySelector("#hud-llegados"),
+  atendidos: document.querySelector("#hud-atendidos"),
+  filas: document.querySelector("#hud-filas"),
+  wq: document.querySelector("#hud-wq"),
+  preferenciales: document.querySelector("#hud-preferenciales"),
+  enServicio: document.querySelector("#hud-en-servicio"),
+  colaMaxima: document.querySelector("#hud-cola-maxima"),
+  posicion: document.querySelector("#posicion-reproduccion"),
+  alternar: document.querySelector("#alternar-reproduccion"),
+  anterior: document.querySelector("#saltar-anterior"),
+  siguiente: document.querySelector("#saltar-siguiente"),
+  estado: document.querySelector("#estado-reproduccion"),
+};
 const numeroReplicas = 500;
 const formatoMinutos = new Intl.NumberFormat("es-CO", {
   minimumFractionDigits: 3,
@@ -233,16 +248,150 @@ function mostrarLineaTiempo(pacientes, datos) {
   lineaTiempo.append(eje);
 }
 
+function crearControlReproduccion() {
+  let instantes = [];
+  let pacientes = [];
+  let indice = 0;
+  let temporizador;
+
+  function detener() {
+    if (temporizador !== undefined) {
+      window.clearInterval(temporizador);
+      temporizador = undefined;
+    }
+    hud.alternar.textContent = "Reproducir";
+    hud.estado.textContent = "Pausada · Espacio: reproducir/pausar · ←/→: saltar · 1/2/3: vistas.";
+  }
+
+  function mostrarInstante() {
+    if (instantes.length === 0) {
+      return;
+    }
+
+    const tiempo = instantes[indice];
+    const llegados = pacientes.filter((paciente) => paciente.llegada <= tiempo);
+    const atendidos = pacientes.filter((paciente) => paciente.fin <= tiempo);
+    const esperando = llegados.filter((paciente) => paciente.inicio > tiempo);
+    const enServicio = llegados.filter(
+      (paciente) => paciente.inicio <= tiempo && paciente.fin > tiempo,
+    );
+    const preferenciales = llegados.filter(
+      (paciente) => paciente.tipo === "Preferencial",
+    );
+    const esperaPromedio =
+      llegados.length === 0
+        ? 0
+        : llegados.reduce((suma, paciente) => suma + paciente.espera, 0) /
+          llegados.length;
+    const colaGeneral = esperando.filter(
+      (paciente) => paciente.tipo === "General",
+    ).length;
+    const colaPreferencial = esperando.filter(
+      (paciente) => paciente.tipo === "Preferencial",
+    ).length;
+
+    hud.reloj.textContent = formatoHoraObservada(tiempo);
+    hud.llegados.textContent = String(llegados.length);
+    hud.atendidos.textContent = String(atendidos.length);
+    hud.filas.textContent = `${colaGeneral} / ${colaPreferencial}`;
+    hud.wq.textContent = `${formatoMinutos.format(esperaPromedio)} min`;
+    hud.preferenciales.textContent = String(preferenciales.length);
+    hud.enServicio.textContent = String(enServicio.length);
+    hud.colaMaxima.textContent = String(esperando.length);
+    hud.posicion.value = String(indice);
+    hud.estado.textContent =
+      `${temporizador ? "Reproduciendo" : "Pausada"} · ` +
+      `${indice + 1} de ${instantes.length} instantes.`;
+  }
+
+  function saltar(cantidad) {
+    if (instantes.length === 0) {
+      return;
+    }
+    detener();
+    indice = Math.max(0, Math.min(instantes.length - 1, indice + cantidad));
+    mostrarInstante();
+  }
+
+  function alternar() {
+    if (instantes.length === 0) {
+      return;
+    }
+    if (temporizador !== undefined) {
+      detener();
+      mostrarInstante();
+      return;
+    }
+    if (indice >= instantes.length - 1) {
+      indice = 0;
+      mostrarInstante();
+    }
+    hud.alternar.textContent = "Pausar";
+    hud.estado.textContent = "Reproduciendo los instantes de llegada y atención…";
+    temporizador = window.setInterval(() => {
+      if (indice >= instantes.length - 1) {
+        detener();
+        mostrarInstante();
+        return;
+      }
+      indice += 1;
+      mostrarInstante();
+    }, 140);
+  }
+
+  function cargar(pacientesSeleccionados) {
+    detener();
+    pacientes = pacientesSeleccionados;
+    instantes = [
+      ...new Set(
+        pacientes.flatMap((paciente) => [
+          paciente.llegada,
+          paciente.inicio,
+          paciente.fin,
+        ]),
+      ),
+    ].sort((a, b) => a - b);
+    indice = 0;
+    hud.posicion.min = "0";
+    hud.posicion.max = String(Math.max(0, instantes.length - 1));
+    hud.posicion.value = "0";
+    hud.posicion.disabled = instantes.length === 0;
+    hud.alternar.disabled = instantes.length === 0;
+    hud.anterior.disabled = instantes.length === 0;
+    hud.siguiente.disabled = instantes.length === 0;
+    mostrarInstante();
+    detener();
+    mostrarInstante();
+  }
+
+  hud.alternar.addEventListener("click", alternar);
+  hud.anterior.addEventListener("click", () => saltar(-1));
+  hud.siguiente.addEventListener("click", () => saltar(1));
+  hud.posicion.addEventListener("input", () => {
+    detener();
+    indice = Number(hud.posicion.value);
+    mostrarInstante();
+  });
+
+  return {
+    alternar,
+    cargar,
+    saltar,
+  };
+}
+
 let datosObservados;
 let referenciaBase;
 let numeroCorrida = 0;
 let escenaLocal;
+const controlReproduccion = crearControlReproduccion();
 
 try {
   escenaLocal = crearLocal3D(contenedorEscena);
   escenaLocal.actualizarCalidad(0);
-  estadoEscena.textContent =
-    "Maqueta lista: 60 espacios de fila, 12 sillas y controles orbitales.";
+  estadoEscena.textContent = escenaLocal.obtenerEstado().calidadReducida
+    ? "Calidad reducida automáticamente para este dispositivo."
+    : "Maqueta lista: 60 espacios de fila, 12 sillas y controles orbitales.";
   document.querySelectorAll("[data-vista]").forEach((boton) => {
     boton.addEventListener("click", () => {
       try {
@@ -265,6 +414,42 @@ try {
   document
     .querySelector('[data-vista="isometrica"]')
     .setAttribute("aria-pressed", "true");
+  document.addEventListener("keydown", (evento) => {
+    const objetivo = evento.target;
+    if (
+      objetivo instanceof HTMLElement &&
+      (objetivo.isContentEditable ||
+        ["INPUT", "SELECT", "TEXTAREA", "BUTTON", "SUMMARY"].includes(
+          objetivo.tagName,
+        ))
+    ) {
+      return;
+    }
+
+    if (evento.code === "Space") {
+      evento.preventDefault();
+      controlReproduccion.alternar();
+    } else if (evento.key === "ArrowLeft") {
+      evento.preventDefault();
+      controlReproduccion.saltar(-1);
+    } else if (evento.key === "ArrowRight") {
+      evento.preventDefault();
+      controlReproduccion.saltar(1);
+    } else if (["1", "2", "3"].includes(evento.key)) {
+      const vista = { "1": "cenital", "2": "isometrica", "3": "frontal" }[
+        evento.key
+      ];
+      escenaLocal.establecerVista(vista);
+      document
+        .querySelectorAll("[data-vista]")
+        .forEach((boton) =>
+          boton.setAttribute(
+            "aria-pressed",
+            String(boton.dataset.vista === vista),
+          ),
+        );
+    }
+  });
 } catch (error) {
   estadoEscena.textContent = `No fue posible cargar la maqueta 3D local: ${error.message}`;
   estadoEscena.className = "estado estado-error";
@@ -334,6 +519,8 @@ botonReplay.addEventListener("click", async () => {
     mostrarCifras(datosObservados);
     mostrarTablaPacientes(comparacion.pacientes, datosObservados);
     mostrarLineaTiempo(comparacion.pacientes, datosObservados);
+    escenaLocal?.actualizarCalidad(comparacion.pacientes.length);
+    controlReproduccion.cargar(comparacion.pacientes);
     resumenSeleccion.textContent =
       `${seleccion.dia} · ${tramo} · ${comparacion.resultados.pacientes} pacientes.`;
     resultadosReplay.hidden = false;

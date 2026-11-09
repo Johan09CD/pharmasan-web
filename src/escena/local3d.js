@@ -545,13 +545,16 @@ export function crearLocal3D(contenedor) {
     throw new TypeError("Se requiere el contenedor de la maqueta 3D.");
   }
 
+  const mediaMovil = window.matchMedia("(max-width: 767px)");
   const renderer = new THREE.WebGLRenderer({
     alpha: true,
     antialias: true,
     powerPreference: "high-performance",
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
-  renderer.shadowMap.enabled = true;
+  renderer.setPixelRatio(
+    Math.min(window.devicePixelRatio || 1, mediaMovil.matches ? 0.7 : 1.5),
+  );
+  renderer.shadowMap.enabled = !mediaMovil.matches;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -571,18 +574,24 @@ export function crearLocal3D(contenedor) {
   const camara = crearCamaraEscena(THREE, contenedor, renderer);
 
   let ultimaActualizacion = 0;
-  let calidadReducida = false;
+  let calidadReducida = mediaMovil.matches;
   let cantidadPersonas = 0;
+  contenedor.dataset.calidad = calidadReducida ? "reducida" : "completa";
 
   function actualizarCalidad(cantidad) {
-    const reducida = requiereCalidadReducida(cantidad);
+    const reducida =
+      mediaMovil.matches || requiereCalidadReducida(cantidad);
     cantidadPersonas = cantidad;
-    if (reducida === calidadReducida) {
+    const cambioCalidad = reducida !== calidadReducida;
+    if (!cambioCalidad) {
       return;
     }
     calidadReducida = reducida;
     renderer.setPixelRatio(
-      Math.min(window.devicePixelRatio || 1, calidadReducida ? 0.85 : 1.5),
+      Math.min(
+        window.devicePixelRatio || 1,
+        mediaMovil.matches ? 0.7 : calidadReducida ? 0.85 : 1.5,
+      ),
     );
     renderer.shadowMap.enabled = !calidadReducida;
     renderer.shadowMap.needsUpdate = true;
@@ -606,6 +615,8 @@ export function crearLocal3D(contenedor) {
   }
 
   const observador = new ResizeObserver(camara.redimensionar);
+  const alCambiarDispositivo = () => actualizarCalidad(cantidadPersonas);
+  mediaMovil.addEventListener("change", alCambiarDispositivo);
   observador.observe(contenedor);
   camara.redimensionar();
   renderer.setAnimationLoop(animar);
@@ -624,6 +635,7 @@ export function crearLocal3D(contenedor) {
     dispose() {
       renderer.setAnimationLoop(null);
       observador.disconnect();
+      mediaMovil.removeEventListener("change", alCambiarDispositivo);
       camara.controles.dispose();
       escena.traverse((objeto) => {
         if (objeto.isMesh || objeto.isInstancedMesh) {

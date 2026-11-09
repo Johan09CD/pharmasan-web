@@ -75,3 +75,18 @@
   120 personas se reduce el pixel ratio y se desactivan sombras. No se animan
   personas en esta fase. El rendimiento de 30 fps es el objetivo de diseño y
   debe medirse en equipos de destino.
+- El diseño pasa a priorizar PC: a partir de 1280 px usa una cuadrícula de
+  escena principal y columna lateral fija; el panel lateral puede desplazarse
+  internamente cuando hay resultados extensos, sin desplazar la escena ni la
+  página. Bajo 768 px se apila la interfaz, el canvas ocupa 45 svh, se oculta
+  el scroll horizontal del documento y los botones táctiles miden al menos
+  44 px. Los indicadores esenciales del HUD quedan visibles y los secundarios
+  van en un desplegable.
+- Los controles de reproducción avanzan por los instantes observados de
+  llegada, inicio y fin; espacio alterna reproducir/pausar, flechas saltan un
+  instante y 1/2/3 cambian las vistas cenital/isométrica/frontal. El modo
+  móvil impone calidad reducida (pixel ratio limitado a 0,7 y sombras
+  desactivadas), además del umbral de carga de 120 personas; no hay sombras ni
+  animación de pacientes. En Playwright se verificó el encuadre 1366×768 y
+  390×844: sin solapamiento de escena/HUD y sin overflow horizontal. El
+  objetivo de 30 fps aún requiere medirlo en equipos reales.

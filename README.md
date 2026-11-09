@@ -79,6 +79,13 @@ ofrecen vistas cenital, isométrica, frontal y «Ver fila», además de órbita 
 ratón o gestos táctiles. El render se limita a 30 fps y reduce resolución y
 sombras automáticamente al registrar 120 o más personas.
 
+La interfaz prioriza escritorio (escena amplia y columna lateral fija desde
+1280 px) y apila escena/HUD en móvil. El HUD de móvil muestra reloj, llegados,
+atendidos, filas y Wq; las métricas adicionales quedan plegadas. Durante la
+reproducción, espacio alterna pausa, ←/→ salta entre instantes y 1/2/3 cambia
+entre las vistas cenital, isométrica y frontal. En móvil se activa calidad
+reducida y se deshabilitan las sombras.
+
 Ejecuta todas las pruebas con:
 
 ```powershell

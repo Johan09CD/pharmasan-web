@@ -11,10 +11,6 @@
       <header class="encabezado">
         <p class="etiqueta">Droguería Pharmasan · Bochalema</p>
         <h1>Simulación de atención</h1>
-        <p class="introduccion">
-          Repite el caso base con las interllegadas observadas, remuestreadas
-          por separado para cada grupo y día.
-        </p>
       </header>
 
       <section class="panel panel-escena" aria-labelledby="titulo-escena">
@@ -30,9 +26,9 @@
           </span>
         </div>
         <div class="controles-vista" role="group" aria-label="Vistas de la maqueta">
-          <button type="button" data-vista="cenital">Cenital</button>
-          <button type="button" data-vista="isometrica">Isométrica</button>
-          <button type="button" data-vista="frontal">Frontal</button>
+          <button type="button" data-vista="cenital" aria-keyshortcuts="1">Cenital <kbd>1</kbd></button>
+          <button type="button" data-vista="isometrica" aria-keyshortcuts="2" aria-pressed="true">Isométrica <kbd>2</kbd></button>
+          <button type="button" data-vista="frontal" aria-keyshortcuts="3">Frontal <kbd>3</kbd></button>
           <button type="button" data-vista="fila">Ver fila</button>
         </div>
         <div
@@ -46,135 +42,143 @@
         </p>
       </section>
 
-      <section class="panel" aria-labelledby="titulo-simulacion">
-        <h2 id="titulo-simulacion">Caso base observado</h2>
-        <p>
-          El servicio usa los ajustes Erlang exportados y la asignación aleatoria
-          entre ventanillas libres.
-        </p>
-        <button id="simular-observados" type="button" disabled>
-          Volver a simular con las llegadas observadas
-        </button>
-        <p id="estado" class="estado" role="status" aria-live="polite">
-          Cargando datos observados…
-        </p>
-      </section>
-
-      <section class="panel" aria-labelledby="titulo-replay">
-        <h2 id="titulo-replay">Reproducir lo observado</h2>
-        <p>
-          Esta opción vuelve a pasar por la atención que ocurrió en Pharmasan:
-          cada paciente conserva su hora de llegada, ventanilla, hora de inicio
-          y duración real del servicio. No sortea nuevos tiempos.
-        </p>
-        <div class="controles-replay">
-          <label for="dia-observado">Día</label>
-          <select id="dia-observado" disabled>
-            <option value="Los tres">Los tres</option>
-            <option value="Lunes">Lunes</option>
-            <option value="Martes">Martes</option>
-            <option value="Viernes">Viernes</option>
-          </select>
-
-          <label for="tramo-observado">Tramo</label>
-          <select id="tramo-observado" disabled>
-            <option value="hora_pico">Hora pico (08:02–09:02)</option>
-            <option value="jornada_completa">Jornada completa</option>
-          </select>
-        </div>
-        <p class="ayuda">
-          Los minutos del archivo comienzan a las 08:00. “Los tres” reproduce
-          cada día por separado para no mezclar eventos de jornadas distintas.
-          En hora pico se muestran las llegadas entre 08:02 y 09:02 incluidas.
-        </p>
-        <button id="reproducir-observado" type="button" disabled>
-          Reproducir lo observado
-        </button>
-        <p id="estado-replay" class="estado" role="status" aria-live="polite">
-          Cargando observaciones…
-        </p>
-      </section>
-
-      <section
-        id="resultados-replay"
-        class="panel"
-        aria-labelledby="titulo-resultados-replay"
-        hidden
-      >
-        <h2 id="titulo-resultados-replay">Resultado de la reproducción</h2>
-        <p id="resumen-seleccion" class="nota-resultados"></p>
-        <div class="tabla-desplazable">
-          <table>
-            <caption>Comparación con las cifras verificadas</caption>
-            <thead>
-              <tr>
-                <th scope="col">Indicador</th>
-                <th scope="col">Cifra verificada</th>
-                <th scope="col">Corrida</th>
-                <th scope="col">Diferencia</th>
-              </tr>
-            </thead>
-            <tbody id="tabla-comparacion"></tbody>
-          </table>
-        </div>
-        <p id="estado-comparacion" class="comparacion" role="status" aria-live="polite"></p>
-
-        <details class="cifras-completas">
-          <summary>Ver todas las cifras verificadas exportadas</summary>
-          <dl id="lista-cifras"></dl>
-        </details>
-
-        <h3>Tabla de pacientes reproducidos</h3>
-        <div class="tabla-desplazable">
-          <table>
-            <caption>Llegada, atención y espera por paciente</caption>
-            <thead>
-              <tr>
-                <th scope="col">Paciente</th>
-                <th scope="col">Día</th>
-                <th scope="col">Grupo</th>
-                <th scope="col">Llegada</th>
-                <th scope="col">Ventanilla</th>
-                <th scope="col">Inicio</th>
-                <th scope="col">Atención</th>
-                <th scope="col">Espera</th>
-                <th scope="col">Fin</th>
-              </tr>
-            </thead>
-            <tbody id="tabla-pacientes"></tbody>
-          </table>
-        </div>
-
-        <h3>Línea de tiempo de atención</h3>
-        <p class="nota-resultados">
-          Cada barra representa el servicio observado desde su inicio hasta su
-          finalización. Los carriles separan días y ventanillas.
-        </p>
-        <div id="linea-tiempo" class="linea-tiempo"></div>
-      </section>
-
-      <section id="resultados" class="panel panel-resultados" aria-labelledby="titulo-resultados" hidden>
-        <h2 id="titulo-resultados">Comparación del caso base</h2>
-        <p class="nota-resultados">
-          Wq es el promedio de 500 réplicas. La semilla inicial se deriva de la
-          exportación de datos.
-        </p>
-        <dl class="medidas">
-          <div>
-            <dt>Wq simulado</dt>
-            <dd id="wq-simulado">—</dd>
+      <aside class="barra-lateral" aria-label="Controles y resultados">
+        <section class="panel panel-hud" aria-labelledby="titulo-hud">
+          <h2 id="titulo-hud">Estado de reproducción</h2>
+          <dl class="hud-esencial">
+            <div><dt>Reloj</dt><dd id="hud-reloj">08:00</dd></div>
+            <div><dt>Llegados</dt><dd id="hud-llegados">0</dd></div>
+            <div><dt>Atendidos</dt><dd id="hud-atendidos">0</dd></div>
+            <div><dt>Filas G / P</dt><dd id="hud-filas">0 / 0</dd></div>
+            <div><dt>Wq</dt><dd id="hud-wq">—</dd></div>
+          </dl>
+          <div class="controles-reproduccion" role="group" aria-label="Controles de reproducción">
+            <button id="saltar-anterior" type="button" aria-label="Saltar al instante anterior" aria-keyshortcuts="ArrowLeft">←</button>
+            <button id="alternar-reproduccion" type="button" disabled aria-keyshortcuts="Space">Reproducir</button>
+            <button id="saltar-siguiente" type="button" aria-label="Saltar al instante siguiente" disabled aria-keyshortcuts="ArrowRight">→</button>
           </div>
-          <div>
-            <dt>Wq referencia Python</dt>
-            <dd id="wq-referencia">—</dd>
+          <label class="solo-lectores" for="posicion-reproduccion">Instante de reproducción</label>
+          <input id="posicion-reproduccion" class="barra-tiempo" type="range" min="0" max="0" value="0" disabled>
+          <p id="estado-reproduccion" class="ayuda">
+            Espacio: reproducir/pausar · ←/→: saltar · 1/2/3: vistas.
+          </p>
+          <details class="hud-detalles">
+            <summary>Más datos del estado</summary>
+            <dl class="medidas-hud">
+              <div><dt>Preferenciales llegados</dt><dd id="hud-preferenciales">0</dd></div>
+              <div><dt>En servicio</dt><dd id="hud-en-servicio">0</dd></div>
+              <div><dt>Cola máxima observada</dt><dd id="hud-cola-maxima">—</dd></div>
+            </dl>
+          </details>
+        </section>
+
+        <section class="panel" aria-labelledby="titulo-replay">
+          <h2 id="titulo-replay">Reproducir lo observado</h2>
+          <p>
+            Conserva la llegada, ventanilla y atención reales; no sortea tiempos.
+          </p>
+          <div class="controles-replay">
+            <label for="dia-observado">Día</label>
+            <select id="dia-observado" disabled>
+              <option value="Los tres">Los tres</option>
+              <option value="Lunes">Lunes</option>
+              <option value="Martes">Martes</option>
+              <option value="Viernes">Viernes</option>
+            </select>
+            <label for="tramo-observado">Tramo</label>
+            <select id="tramo-observado" disabled>
+              <option value="hora_pico">Hora pico (08:02–09:02)</option>
+              <option value="jornada_completa">Jornada completa</option>
+            </select>
           </div>
-          <div>
-            <dt>IC 95 % Python</dt>
-            <dd id="ic-referencia">—</dd>
+          <details class="ayuda-plegable">
+            <summary>Ayuda sobre los datos</summary>
+            <p class="ayuda">
+              Los minutos del archivo comienzan a las 08:00. “Los tres”
+              reproduce cada día por separado. En hora pico se incluyen las
+              llegadas entre 08:02 y 09:02.
+            </p>
+          </details>
+          <button id="reproducir-observado" type="button" disabled>
+            Cargar reproducción observada
+          </button>
+          <p id="estado-replay" class="estado" role="status" aria-live="polite">
+            Cargando observaciones…
+          </p>
+        </section>
+
+        <section class="panel" aria-labelledby="titulo-simulacion">
+          <h2 id="titulo-simulacion">Caso base simulado</h2>
+          <button id="simular-observados" type="button" disabled>
+            Volver a simular con las llegadas observadas
+          </button>
+          <p id="estado" class="estado" role="status" aria-live="polite">
+            Cargando datos observados…
+          </p>
+          <div id="resultados" class="resultados-base" hidden>
+            <dl class="medidas">
+              <div><dt>Wq simulado</dt><dd id="wq-simulado">—</dd></div>
+              <div><dt>Wq referencia Python</dt><dd id="wq-referencia">—</dd></div>
+              <div><dt>IC 95 % Python</dt><dd id="ic-referencia">—</dd></div>
+            </dl>
+            <p id="comparacion" class="comparacion" role="status" aria-live="polite"></p>
           </div>
-        </dl>
-        <p id="comparacion" class="comparacion" role="status" aria-live="polite"></p>
-      </section>
+        </section>
+
+        <section
+          id="resultados-replay"
+          class="panel panel-resultados"
+          aria-labelledby="titulo-resultados-replay"
+          hidden
+        >
+          <h2 id="titulo-resultados-replay">Detalle de la reproducción</h2>
+          <p id="resumen-seleccion" class="nota-resultados"></p>
+          <div class="tabla-desplazable">
+            <table>
+              <caption>Comparación con las cifras verificadas</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Indicador</th>
+                  <th scope="col">Cifra verificada</th>
+                  <th scope="col">Corrida</th>
+                  <th scope="col">Diferencia</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-comparacion"></tbody>
+            </table>
+          </div>
+          <p id="estado-comparacion" class="comparacion" role="status" aria-live="polite"></p>
+          <details class="cifras-completas">
+            <summary>Ver todas las cifras verificadas exportadas</summary>
+            <dl id="lista-cifras"></dl>
+          </details>
+          <h3>Tabla de pacientes reproducidos</h3>
+          <div class="tabla-desplazable">
+            <table>
+              <caption>Llegada, atención y espera por paciente</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Paciente</th>
+                  <th scope="col">Día</th>
+                  <th scope="col">Grupo</th>
+                  <th scope="col">Llegada</th>
+                  <th scope="col">Ventanilla</th>
+                  <th scope="col">Inicio</th>
+                  <th scope="col">Atención</th>
+                  <th scope="col">Espera</th>
+                  <th scope="col">Fin</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-pacientes"></tbody>
+            </table>
+          </div>
+          <h3>Línea de tiempo de atención</h3>
+          <p class="nota-resultados">
+            Las barras muestran el servicio por día y ventanilla.
+          </p>
+          <div id="linea-tiempo" class="linea-tiempo"></div>
+        </section>
+      </aside>
     </main>
     <script type="module" src="src/ui/app.js"></script>
   </body>
