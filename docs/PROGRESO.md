@@ -1,5 +1,27 @@
 # Progreso
 
+## Estado actual para transferencia
+
+- **Completas:** fases **0 a 5** (esqueleto e inicio de git; exportación de
+  datos; motor; modo observados; escena 3D; animación/HUD, incluidas las
+  Entregas A y B).
+- **Abiertas:** fases **6 a 9** (laboratorio; réplicas y comparación; pulido;
+  despliegue en GitHub Pages). No se inicia trabajo de esas fases en esta
+  transferencia.
+
+## Pendientes antes de la fase 6
+
+- **Rendimiento:** con la jornada de **131 pacientes** se midieron entre **21 y
+  28 fps**, por debajo de la meta de **30 fps**. Falta optimizar la escena y
+  volver a medir antes de dar por cumplido el objetivo.
+- **CSV:** la interfaz preparó el archivo y mostró su nombre, pero el navegador
+  de prueba no expuso el evento de descarga; la recepción efectiva del archivo
+  queda sin verificar.
+- **Cambio de `src/engine/simulador.js` en la Entrega A:** se añadió el campo
+  `paciente_tipo: paciente.tipo` al objeto de cada evento. Es un dato aditivo
+  del registro para identificar el grupo en la escena; no altera el calendario
+  ni las métricas.
+
 ## 2026-11-09 — Entrega B: resumen final y exportación CSV
 
 - **Hecho:** añadido un resumen que aparece al terminar toda la selección y
@@ -16,9 +38,8 @@
   **Wq = 0,155 min**; el panel se ocultó antes del final y se habilitó al
   completarlo. El manejador preparó
   `pharmasan-reproduccion-los-tres-hora-pico.csv`.
-- **Pendiente:** el navegador integrado no expuso un evento `download` para
-  confirmar la recepción del archivo; quedan las fases 6–9, aún no marcadas
-  como completadas en `PLAN.md`.
+- **Pendiente:** verificar la recepción real del archivo descargado; las fases
+  6–9 siguen abiertas.
 
 ## 2026-11-09 — Entrega A: animación de pacientes desde eventos
 
@@ -44,9 +65,8 @@
   aproximadamente **45 svh**. Con la carga de 131 pacientes y cuatro visibles,
   el navegador de prueba midió **23–28 fps** en cuatro muestras consecutivas;
   no se sostuvo la meta de 30 fps en ese navegador.
-- **Pendiente:** optimizar el rendimiento adicional si se requiere mantener
-  30 fps en otros equipos; la aprobación de la Entrega A permitió continuar
-  con el resumen final y la exportación CSV registrados arriba.
+- **Pendiente:** optimizar el rendimiento para alcanzar la meta de 30 fps; las
+  mediciones registradas para 131 pacientes están entre 21 y 28 fps.
 
 ## 2026-11-09 — Diseño adaptable prioritario para PC y controles HUD
 

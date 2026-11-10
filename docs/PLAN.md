@@ -1,5 +1,6 @@
 # Plan del proyecto
 
+- [x] 0. Crear esqueleto del proyecto e iniciar git
 - [x] 1. Exportar datos
 - [x] 2. Implementar el motor
 - [x] 3. Crear el modo observados (selección de día/tramo, replay, cifras y vistas)
