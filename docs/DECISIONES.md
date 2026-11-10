@@ -111,8 +111,14 @@
   corridas separadas; al cerrar cada una, el HUD presenta el agregado ya
   comparado con la tabla y la reproducción se pausa antes del siguiente día.
   En la selección «Los tres», hora pico, se conserva la referencia de 71
-  pacientes, 7 esperas y Wq de 0,155 min. No se inició el resumen final ni la
-  exportación CSV (Entrega B), que espera la aprobación de la captura.
+  pacientes, 7 esperas y Wq de 0,155 min.
+- La Entrega B presenta el resumen final solo cuando termina toda la selección;
+  reutiliza los resultados de la comparación ya calculada y no vuelve a
+  calcular métricas. El CSV exporta una fila por paciente observado con grupo,
+  día, llegada, ventanilla, inicio, atención, espera y fin; usa UTF-8 con BOM,
+  separador `;`, decimales con coma y escape de campos según CSV. El nombre
+  incluye día y tramo. La habilitación del panel y la conversión de datos se
+  prueban en navegador y Node, respectivamente.
 - La carga de jornada completa reúne 131 pacientes en las tres corridas, no
   simultáneos: los snapshots observados alcanzan un máximo de 4 personas en
   sistema. A partir de 120 pacientes se activa calidad reducida y sombras

@@ -3,6 +3,10 @@ import { correrReplicas } from "../engine/replicas.js";
 import { crearLocal3D } from "../escena/local3d.js";
 import { crearConfiguracionBase } from "./observados.js";
 import {
+  crearCsvPacientes,
+  nombreCsvReproduccion,
+} from "./exportar-csv.js";
+import {
   compararReproduccionObservada,
   crearConfiguracionesReproduccion,
   cifrasVerificadas,
@@ -15,6 +19,12 @@ const estado = document.querySelector("#estado");
 const estadoReplay = document.querySelector("#estado-replay");
 const resultados = document.querySelector("#resultados");
 const resultadosReplay = document.querySelector("#resultados-replay");
+const resumenFinalReplay = document.querySelector("#resumen-final-replay");
+const resumenFinalPacientes = document.querySelector("#resumen-final-pacientes");
+const resumenFinalEsperaron = document.querySelector("#resumen-final-esperaron");
+const resumenFinalWq = document.querySelector("#resumen-final-wq");
+const botonCsv = document.querySelector("#descargar-csv");
+const estadoCsv = document.querySelector("#estado-csv");
 const valorWq = document.querySelector("#wq-simulado");
 const referenciaWq = document.querySelector("#wq-referencia");
 const intervaloReferencia = document.querySelector("#ic-referencia");
@@ -53,6 +63,8 @@ const formatoMinutos = new Intl.NumberFormat("es-CO", {
   minimumFractionDigits: 3,
   maximumFractionDigits: 3,
 });
+let comparacionParaCsv;
+let seleccionParaCsv;
 
 function mostrarError(elemento, error, boton) {
   elemento.textContent = `No fue posible ejecutar la operación: ${error.message}`;
@@ -189,6 +201,24 @@ function mostrarTablaPacientes(pacientes, datos) {
   }
 }
 
+function actualizarResumenFinal(visible, comparacion) {
+  resumenFinalReplay.hidden = !visible;
+  botonCsv.disabled = !visible;
+  if (!visible || !comparacion) {
+    estadoCsv.textContent = "";
+    estadoCsv.className = "estado";
+    return;
+  }
+
+  resumenFinalPacientes.textContent = String(comparacion.resultados.pacientes);
+  resumenFinalEsperaron.textContent = String(comparacion.resultados.esperaron);
+  resumenFinalWq.textContent =
+    `${formatoMinutos.format(comparacion.resultados.Wq)} min`;
+  estadoCsv.textContent =
+    "Resumen de la selección completada. Las cifras se toman de la comparación ya calculada.";
+  estadoCsv.className = "estado";
+}
+
 function crearCarril(dia, ventanilla, pacientes, maximo) {
   const contenedor = document.createElement("div");
   contenedor.className = "carril-tiempo";
@@ -262,6 +292,8 @@ function crearControlReproduccion() {
   let corridaEnPausa = null;
   let temporizador;
   let ultimaMarca;
+  let notificarFin = () => {};
+  let resumenFinalVisible = false;
 
   function detener() {
     if (temporizador !== undefined) {
@@ -359,6 +391,12 @@ function crearControlReproduccion() {
     hud.estado.textContent =
       `${temporizador ? "Reproduciendo" : "Pausada"} · ` +
       `${corrida.dia} · ${formatoHoraObservada(tiempoLocal)}.`;
+    const seleccionCompletada =
+      duracionTotal > 0 && tiempoGlobal >= duracionTotal;
+    if (seleccionCompletada !== resumenFinalVisible) {
+      resumenFinalVisible = seleccionCompletada;
+      notificarFin(seleccionCompletada, resumen);
+    }
   }
 
   function saltar(cantidad) {
@@ -438,6 +476,8 @@ function crearControlReproduccion() {
     corridaActual = -1;
     corridaEnPausa = null;
     tiempoGlobal = 0;
+    resumenFinalVisible = false;
+    notificarFin(false, resumen);
     hud.reloj.textContent = "08:00";
     hud.llegados.textContent = "0";
     hud.atendidos.textContent = "0";
@@ -451,10 +491,13 @@ function crearControlReproduccion() {
     hud.estado.textContent = "Pausada · Reproducción reiniciada.";
   }
 
-  function cargar(corridasNuevas, resumenNuevo) {
+  function cargar(corridasNuevas, resumenNuevo, callbackFinal) {
     detener();
     corridas = [];
     resumen = resumenNuevo;
+    notificarFin = callbackFinal ?? (() => {});
+    resumenFinalVisible = false;
+    notificarFin(false, resumen);
     duracionTotal = 0;
     instantes = [];
     for (const [indice, corrida] of corridasNuevas.entries()) {
@@ -630,6 +673,7 @@ botonReplay.addEventListener("click", async () => {
   botonReplay.disabled = true;
   estadoReplay.textContent = "Reproduciendo los registros observados…";
   estadoReplay.className = "estado";
+  actualizarResumenFinal(false, comparacionParaCsv);
   await new Promise((resolver) => setTimeout(resolver, 0));
 
   try {
@@ -662,6 +706,8 @@ botonReplay.addEventListener("click", async () => {
     mostrarTablaPacientes(comparacion.pacientes, datosObservados);
     mostrarLineaTiempo(comparacion.pacientes, datosObservados);
     escenaLocal?.actualizarCalidad(comparacion.pacientes.length);
+    comparacionParaCsv = comparacion;
+    seleccionParaCsv = seleccion;
     controlReproduccion.cargar(
       corridasReproducidas.map((corrida, indice) => ({
         eventos: corrida.eventos,
@@ -670,6 +716,7 @@ botonReplay.addEventListener("click", async () => {
           (seleccion.dia === "Los tres" ? `Día ${indice + 1}` : seleccion.dia),
       })),
       comparacion,
+      actualizarResumenFinal,
     );
     resumenSeleccion.textContent =
       `${seleccion.dia} · ${tramo} · ${comparacion.resultados.pacientes} pacientes.`;
@@ -682,6 +729,33 @@ botonReplay.addEventListener("click", async () => {
     mostrarError(estadoReplay, error, botonReplay);
   } finally {
     botonReplay.disabled = false;
+  }
+});
+
+botonCsv.addEventListener("click", () => {
+  if (!comparacionParaCsv || !seleccionParaCsv || !datosObservados) {
+    return;
+  }
+  try {
+    const nombre = nombreCsvReproduccion(seleccionParaCsv);
+    const contenido = crearCsvPacientes(
+      comparacionParaCsv.pacientes,
+      datosObservados,
+    );
+    const archivo = new Blob([contenido], {
+      type: "text/csv;charset=utf-8",
+    });
+    const url = URL.createObjectURL(archivo);
+    const enlace = document.createElement("a");
+    enlace.href = url;
+    enlace.download = nombre;
+    enlace.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    estadoCsv.textContent = `Descarga preparada: ${nombre}.`;
+    estadoCsv.className = "estado estado-correcto";
+  } catch (error) {
+    estadoCsv.textContent = `No fue posible exportar el CSV: ${error.message}`;
+    estadoCsv.className = "estado estado-error";
   }
 });
 

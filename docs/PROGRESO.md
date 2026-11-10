@@ -1,5 +1,25 @@
 # Progreso
 
+## 2026-11-09 — Entrega B: resumen final y exportación CSV
+
+- **Hecho:** añadido un resumen que aparece al terminar toda la selección y
+  muestra los pacientes, quienes esperaron y Wq desde la comparación ya
+  calculada, sin recomputar métricas. El botón permite descargar una fila por
+  paciente en CSV UTF-8, con encabezados en español, separador `;` y decimales
+  locales. Los errores al preparar datos o exportar se muestran en la interfaz.
+- **Archivos:** `index.html`, `src/ui/app.js`, `src/ui/estilos.css`,
+  `src/ui/exportar-csv.js`, `tests/exportar_csv.test.js`, `README.md`,
+  `docs/PLAN.md`, `docs/PROGRESO.md` y `docs/DECISIONES.md`.
+- **Resultados:** `node --test`: **38 aprobadas, 0 fallidas**; `node --check`
+  para los módulos modificados y `git diff --check`: sin errores. En Playwright,
+  «Los tres» y hora pico mostró al finalizar **71 pacientes**, **7 esperas** y
+  **Wq = 0,155 min**; el panel se ocultó antes del final y se habilitó al
+  completarlo. El manejador preparó
+  `pharmasan-reproduccion-los-tres-hora-pico.csv`.
+- **Pendiente:** el navegador integrado no expuso un evento `download` para
+  confirmar la recepción del archivo; quedan las fases 6–9, aún no marcadas
+  como completadas en `PLAN.md`.
+
 ## 2026-11-09 — Entrega A: animación de pacientes desde eventos
 
 - **Hecho:** añadidos pacientes low-poly instanciados con identificador y color
@@ -24,9 +44,9 @@
   aproximadamente **45 svh**. Con la carga de 131 pacientes y cuatro visibles,
   el navegador de prueba midió **23–28 fps** en cuatro muestras consecutivas;
   no se sostuvo la meta de 30 fps en ese navegador.
-- **Pendiente:** aprobación de la captura de esta entrega. No se inició la
-  Entrega B (resumen final ni CSV); optimizar el rendimiento adicional queda
-  pendiente si se requiere mantener 30 fps en otros equipos.
+- **Pendiente:** optimizar el rendimiento adicional si se requiere mantener
+  30 fps en otros equipos; la aprobación de la Entrega A permitió continuar
+  con el resumen final y la exportación CSV registrados arriba.
 
 ## 2026-11-09 — Diseño adaptable prioritario para PC y controles HUD
 

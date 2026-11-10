@@ -94,6 +94,12 @@ métricas. Los controles existentes incluyen reinicio y velocidad de 0,5× a
 30×. Los días seleccionados se reproducen por separado y, al cierre de cada
 corrida, el HUD muestra el resumen ya comparado con la tabla.
 
+Al finalizar toda la selección aparece un resumen con pacientes, pacientes que
+esperaron y Wq, usando el resultado calculado de la comparación. Desde allí se
+puede descargar un CSV con una fila por paciente y sus día, grupo, llegada,
+ventanilla, inicio, tiempo de atención, espera y fin. El archivo usa UTF-8,
+separador `;` y formato decimal local.
+
 La aplicación mide los fps del render y los presenta en el estado de la escena.
 En la prueba de navegador a 1366×768, la selección de jornada completa con 131
 pacientes y un máximo simultáneo de cuatro registró 23–28 fps en cuatro

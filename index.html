@@ -155,6 +155,23 @@
             </table>
           </div>
           <p id="estado-comparacion" class="comparacion" role="status" aria-live="polite"></p>
+          <section
+            id="resumen-final-replay"
+            class="resumen-final"
+            aria-labelledby="titulo-resumen-final"
+            hidden
+          >
+            <h3 id="titulo-resumen-final">Resumen final de reproducción</h3>
+            <dl class="medidas">
+              <div><dt>Pacientes</dt><dd id="resumen-final-pacientes">—</dd></div>
+              <div><dt>Pacientes que esperaron</dt><dd id="resumen-final-esperaron">—</dd></div>
+              <div><dt>Wq</dt><dd id="resumen-final-wq">—</dd></div>
+            </dl>
+            <button id="descargar-csv" type="button" disabled>
+              Descargar CSV de pacientes
+            </button>
+            <p id="estado-csv" class="estado" role="status" aria-live="polite"></p>
+          </section>
           <details class="cifras-completas">
             <summary>Ver todas las cifras verificadas exportadas</summary>
             <dl id="lista-cifras"></dl>
