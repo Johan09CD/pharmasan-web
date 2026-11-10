@@ -2,6 +2,7 @@ import { simular } from "../engine/simulador.js";
 import { correrReplicas } from "../engine/replicas.js";
 import { crearLocal3D } from "../escena/local3d.js";
 import { crearConfiguracionBase } from "./observados.js";
+import { iniciarLaboratorio } from "./laboratorio.js";
 import {
   crearCsvPacientes,
   nombreCsvReproduccion,
@@ -65,6 +66,7 @@ const formatoMinutos = new Intl.NumberFormat("es-CO", {
 });
 let comparacionParaCsv;
 let seleccionParaCsv;
+let datosParaCsv;
 
 function mostrarError(elemento, error, boton) {
   elemento.textContent = `No fue posible ejecutar la operación: ${error.message}`;
@@ -558,6 +560,7 @@ let datosObservados;
 let referenciaBase;
 let numeroCorrida = 0;
 let escenaLocal;
+const formularioLaboratorio = document.querySelector("#formulario-laboratorio");
 const controlReproduccion = crearControlReproduccion();
 
 try {
@@ -708,6 +711,7 @@ botonReplay.addEventListener("click", async () => {
     escenaLocal?.actualizarCalidad(comparacion.pacientes.length);
     comparacionParaCsv = comparacion;
     seleccionParaCsv = seleccion;
+    datosParaCsv = datosObservados;
     controlReproduccion.cargar(
       corridasReproducidas.map((corrida, indice) => ({
         eventos: corrida.eventos,
@@ -733,14 +737,14 @@ botonReplay.addEventListener("click", async () => {
 });
 
 botonCsv.addEventListener("click", () => {
-  if (!comparacionParaCsv || !seleccionParaCsv || !datosObservados) {
+  if (!comparacionParaCsv || !seleccionParaCsv || !datosParaCsv) {
     return;
   }
   try {
     const nombre = nombreCsvReproduccion(seleccionParaCsv);
     const contenido = crearCsvPacientes(
       comparacionParaCsv.pacientes,
-      datosObservados,
+      datosParaCsv,
     );
     const archivo = new Blob([contenido], {
       type: "text/csv;charset=utf-8",
@@ -775,6 +779,37 @@ try {
     "Datos y referencia Python cargados. La simulación remuestrea por separado las interllegadas de cada grupo y día.";
   estadoReplay.textContent =
     "Elige un día y un tramo para reproducir los registros observados.";
+  iniciarLaboratorio({
+    formulario: formularioLaboratorio,
+    datos: datosObservados,
+    alVolverObservados: () => botonReplay.click(),
+    alSimular: async ({ corrida, metricas }) => {
+      resultadosReplay.hidden = true;
+      const resumen = {
+        pacientes: corrida.pacientes,
+        resultados: {
+          pacientes: metricas.n,
+          esperaron: corrida.pacientes.filter((paciente) => paciente.espera > 0)
+            .length,
+          Wq: metricas.Wq,
+        },
+      };
+      comparacionParaCsv = resumen;
+      seleccionParaCsv = { dia: "Simulación", tramo: "laboratorio" };
+      datosParaCsv = {
+        pacientes: corrida.pacientes.map((paciente) => ({
+          id: paciente.id,
+          dia: "Laboratorio",
+        })),
+      };
+      escenaLocal?.actualizarCalidad(metricas.n);
+      controlReproduccion.cargar(
+        [{ eventos: corrida.eventos, dia: "Laboratorio" }],
+        resumen,
+        actualizarResumenFinal,
+      );
+    },
+  });
 } catch (error) {
   mostrarError(estado, error, botonBase);
   estadoReplay.textContent = error.message;

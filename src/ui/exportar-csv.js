@@ -3,11 +3,13 @@ const DIAS = new Map([
   ["Martes", "martes"],
   ["Viernes", "viernes"],
   ["Los tres", "los-tres"],
+  ["Simulación", "simulacion"],
 ]);
 
 const TRAMOS = new Map([
   ["hora_pico", "hora-pico"],
   ["jornada_completa", "jornada-completa"],
+  ["laboratorio", "laboratorio"],
 ]);
 
 function citar(valor) {

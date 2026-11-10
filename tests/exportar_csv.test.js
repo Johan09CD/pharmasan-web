@@ -40,6 +40,10 @@ test("crea nombres de archivo para cada selección disponible", () => {
     nombreCsvReproduccion({ dia: "Martes", tramo: "jornada_completa" }),
     "pharmasan-reproduccion-martes-jornada-completa.csv",
   );
+  assert.equal(
+    nombreCsvReproduccion({ dia: "Simulación", tramo: "laboratorio" }),
+    "pharmasan-reproduccion-simulacion-laboratorio.csv",
+  );
 });
 
 test("rechaza datos incompletos al preparar la descarga", () => {

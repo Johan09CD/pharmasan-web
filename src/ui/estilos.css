@@ -11,6 +11,10 @@
   box-sizing: border-box;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 html,
 body {
   width: 100%;
@@ -400,9 +404,156 @@ summary {
 }
 
 #reproducir-observado,
-#simular-observados {
+#simular-observados,
+#simular-laboratorio,
+#volver-observados {
   width: 100%;
   font-size: 0.88rem;
+}
+
+#volver-observados,
+.boton-secundario {
+  margin-top: 0.45rem;
+  border: 1px solid #8eaa99;
+  background: #edf4ef;
+  color: #214d39;
+}
+
+.panel-laboratorio form {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.panel-laboratorio fieldset,
+.ventanilla-laboratorio,
+.atencion-laboratorio {
+  min-width: 0;
+  margin: 0;
+  padding: 0.65rem;
+  border: 1px solid #d5e2d9;
+  border-radius: 0.55rem;
+}
+
+.panel-laboratorio legend {
+  padding-inline: 0.25rem;
+  color: #206344;
+  font-size: 0.88rem;
+  font-weight: 750;
+}
+
+.campo-laboratorio {
+  display: grid;
+  min-width: 0;
+  gap: 0.25rem;
+  margin: 0.5rem 0;
+  color: #274c3b;
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+.campo-laboratorio input,
+.campo-laboratorio select {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid #afc5b7;
+  border-radius: 0.4rem;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-weight: 450;
+}
+
+.campo-laboratorio small,
+.ventanilla-laboratorio small {
+  color: #586e62;
+  font-size: 0.72rem;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.campo-con-error {
+  border-color: #b83a30 !important;
+}
+
+.campo-laboratorio [aria-invalid="true"] {
+  border: 2px solid #b83a30;
+}
+
+.error-campo {
+  display: block;
+  margin-top: 0.2rem;
+  color: #a32121 !important;
+  font-size: 0.75rem !important;
+  font-weight: 650 !important;
+}
+
+.lista-ventanillas,
+.bloque-laboratorio,
+#atencion-laboratorio {
+  display: grid;
+  min-width: 0;
+  gap: 0.5rem;
+}
+
+.acciones-ventanilla {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+}
+
+.acciones-ventanilla button,
+#agregar-ventanilla,
+#aplicar-preajuste,
+#nueva-semilla {
+  min-height: 44px;
+  font-size: 0.78rem;
+}
+
+#advertencias-laboratorio {
+  padding-inline: 0.25rem;
+}
+
+.estado-advertencia {
+  padding: 0.55rem;
+  border-radius: 0.45rem;
+  background: #fff4d6;
+  color: #714d00;
+  font-weight: 650;
+}
+
+.resultados-laboratorio {
+  min-width: 0;
+}
+
+.resultados-laboratorio .medidas {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.panel-laboratorio table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.74rem;
+}
+
+.panel-laboratorio caption {
+  padding: 0.4rem;
+  text-align: left;
+}
+
+.panel-laboratorio th,
+.panel-laboratorio td {
+  padding: 0.25rem;
+  border-bottom: 1px solid #d5e2d9;
+  text-align: left;
+}
+
+.panel-laboratorio td input {
+  width: 5rem;
+  min-height: 40px;
+  padding: 0.3rem;
 }
 
 .ayuda-plegable p {

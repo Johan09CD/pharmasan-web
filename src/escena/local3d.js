@@ -634,7 +634,8 @@ export function crearLocal3D(contenedor) {
     ocupado: recursos.material(0xe4a63b, { emissive: 0x60300d }),
     progreso: recursos.material(0x52a879, { emissive: 0x1b452b }),
   };
-  const indicadores = [-4.65, -0.5, 4.35].map((x) => {
+  const posicionesIndicadores = [-4.65, -0.5, 4.35, -6.5, -2.6, 1.3, 5.2, 7];
+  const indicadores = posicionesIndicadores.map((x, indice) => {
     const luz = new THREE.Mesh(
       recursos.geometriaCaja(0.26, 0.18, 0.08),
       materialesIndicadores.libre,
@@ -652,9 +653,34 @@ export function crearLocal3D(contenedor) {
     barra.position.set(x - 0.81, 1.38, -0.97);
     barra.scale.x = 0;
     barra.visible = false;
+    const fondoVisible = indice < 3;
+    luz.visible = fondoVisible;
+    fondoBarra.visible = fondoVisible;
     escena.add(luz, fondoBarra, barra);
-    return { luz, barra, x };
+    return { luz, fondoBarra, barra, x };
   });
+  function configurarIndicadores(cantidad) {
+    const cantidadSegura = Math.max(1, Math.min(8, cantidad));
+    const posiciones =
+      cantidadSegura === 3
+        ? posicionesIndicadores.slice(0, 3)
+        : Array.from({ length: cantidadSegura }, (_, indice) =>
+            cantidadSegura === 1
+              ? 0
+              : -6.5 + (13 * indice) / (cantidadSegura - 1),
+          );
+    for (const [indice, indicador] of indicadores.entries()) {
+      const visible = indice < cantidadSegura;
+      const x = posiciones[indice] ?? indicador.x;
+      indicador.x = x;
+      indicador.luz.position.x = x;
+      indicador.fondoBarra.position.x = x;
+      indicador.barra.position.x = x - 0.81;
+      indicador.luz.visible = visible;
+      indicador.fondoBarra.visible = visible;
+      if (!visible) indicador.barra.visible = false;
+    }
+  }
   contenedor.dataset.calidad = calidadReducida ? "reducida" : "completa";
 
   function liberarPersonas() {
@@ -672,6 +698,7 @@ export function crearLocal3D(contenedor) {
       indicador.barra.scale.x = 0;
       indicador.barra.visible = false;
     }
+    configurarIndicadores(3);
   }
 
   function crearPersonas(eventos) {
@@ -777,7 +804,12 @@ export function crearLocal3D(contenedor) {
     );
     for (let indice = 0; indice < idsPersonas.length; indice += 1) {
       const persona = personasPorId.get(idsPersonas[indice]);
-      const posicion = persona?.posicion ?? [0, -100, 0];
+      const indiceVentanilla = Number(String(persona?.ventanilla ?? "").replace(/\D/g, "")) - 1;
+      const indicadorVentanilla = indicadores[indiceVentanilla];
+      const posicion =
+        persona?.estado === "servicio" && indicadorVentanilla
+          ? [indicadorVentanilla.x, 0, -0.75]
+          : persona?.posicion ?? [0, -100, 0];
       establecerInstancia(
         mallasPersonas[0],
         indice,
@@ -844,6 +876,11 @@ export function crearLocal3D(contenedor) {
 
   function cargarEventos(eventos) {
     liberarPersonas();
+    const cantidadVentanillas = Math.max(
+      0,
+      ...eventos.map((evento) => evento.estado?.ventanillas?.length ?? 0),
+    );
+    configurarIndicadores(cantidadVentanillas || 3);
     frameActual = controlPersonas.cargar(eventos);
     crearPersonas(eventos);
   }

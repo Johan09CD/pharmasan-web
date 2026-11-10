@@ -79,6 +79,24 @@
           </details>
         </section>
 
+        <section
+          id="resumen-final-replay"
+          class="panel resumen-final"
+          aria-labelledby="titulo-resumen-final"
+          hidden
+        >
+          <h2 id="titulo-resumen-final">Resumen final</h2>
+          <dl class="medidas">
+            <div><dt>Pacientes</dt><dd id="resumen-final-pacientes">—</dd></div>
+            <div><dt>Pacientes que esperaron</dt><dd id="resumen-final-esperaron">—</dd></div>
+            <div><dt>Wq</dt><dd id="resumen-final-wq">—</dd></div>
+          </dl>
+          <button id="descargar-csv" type="button" disabled>
+            Descargar CSV de pacientes
+          </button>
+          <p id="estado-csv" class="estado" role="status" aria-live="polite"></p>
+        </section>
+
         <section class="panel" aria-labelledby="titulo-replay">
           <h2 id="titulo-replay">Reproducir lo observado</h2>
           <p>
@@ -132,6 +150,184 @@
           </div>
         </section>
 
+        <section class="panel panel-laboratorio" aria-labelledby="titulo-laboratorio">
+          <h2 id="titulo-laboratorio">Laboratorio para la docente</h2>
+          <p>
+            Cambia los valores y prueba escenarios sin modificar el código.
+            La escena permanece visible mientras recorres este formulario.
+          </p>
+          <form id="formulario-laboratorio" novalidate>
+            <fieldset id="laboratorio-configuracion">
+              <legend>Ventanillas</legend>
+              <label class="campo-laboratorio" for="nombre-preajuste">
+                <span>Preajuste</span>
+                <select id="nombre-preajuste" name="nombre_preajuste">
+                  <option>Actual (2 generales + 1 preferencial)</option>
+                  <option>Con apoyo</option>
+                  <option>Una sola cola compartida</option>
+                  <option>Cuarta ventanilla</option>
+                </select>
+                <small>Parte de una distribución común y luego ajústala.</small>
+              </label>
+              <button id="aplicar-preajuste" type="button">Aplicar preajuste</button>
+              <div id="laboratorio-ventanillas" class="lista-ventanillas"></div>
+              <button id="agregar-ventanilla" type="button">Agregar ventanilla</button>
+            </fieldset>
+
+            <fieldset>
+              <legend>Llegadas y demanda</legend>
+              <label class="campo-laboratorio" for="modo-llegadas">
+                <span>Cómo llegan</span>
+                <select id="modo-llegadas" name="modoLlegadas">
+                  <option value="observados">Patrones observados por grupo y día</option>
+                  <option value="poisson">Tasa por hora de cada grupo (Poisson)</option>
+                  <option value="intervalo_fijo">Tiempo entre llegadas fijo</option>
+                  <option value="intervalo_normal">Media y desviación entre llegadas</option>
+                  <option value="conteos">Conteos por intervalo observado de 5 min</option>
+                </select>
+                <small>Define el mecanismo que genera las llegadas.</small>
+              </label>
+              <div data-modo-llegada="poisson" class="bloque-laboratorio" hidden>
+                <label class="campo-laboratorio" for="tasa-general">
+                  <span>Tasa General (pacientes/h)</span>
+                  <input id="tasa-general" name="tasaGeneralHora" type="number" min="0" max="3000" step="any">
+                  <small>Número promedio de llegadas generales por hora.</small>
+                </label>
+                <label class="campo-laboratorio" for="tasa-preferencial">
+                  <span>Tasa adulto mayor (pacientes/h)</span>
+                  <input id="tasa-preferencial" name="tasaPreferencialHora" type="number" min="0" max="3000" step="any">
+                  <small>Número promedio de llegadas preferenciales por hora.</small>
+                </label>
+              </div>
+              <div data-modo-llegada="intervalo_fijo intervalo_normal" class="bloque-laboratorio" hidden>
+                <label class="campo-laboratorio" for="intervalo-media">
+                  <span>Media entre llegadas (min)</span>
+                  <input id="intervalo-media" name="intervaloMedia" type="number" min="0.001" max="10000" step="any">
+                  <small>Tiempo típico entre dos pacientes.</small>
+                </label>
+                <label class="campo-laboratorio" for="intervalo-desviacion" data-modo-llegada="intervalo_normal" hidden>
+                  <span>Desviación del intervalo (min)</span>
+                  <input id="intervalo-desviacion" name="intervaloDesviacion" type="number" min="0" max="10000" step="any">
+                  <small>Variabilidad alrededor de la media; valores no positivos se vuelven a sortear.</small>
+                </label>
+              </div>
+              <div data-modo-llegada="conteos" class="bloque-laboratorio" hidden>
+                <label id="ayuda-conteos-dia" class="campo-laboratorio" for="dia-conteos" hidden>
+                  <span>Día de los conteos</span>
+                  <select id="dia-conteos" name="diaConteos">
+                    <option value="Lunes">Lunes</option>
+                    <option value="Martes">Martes</option>
+                    <option value="Viernes">Viernes</option>
+                  </select>
+                  <small>Elige qué día observado usar como punto de partida.</small>
+                </label>
+                <div id="ayuda-conteos-tabla" hidden>
+                  <p class="ayuda">Edita el conteo del grupo y tramo que corresponda.</p>
+                  <div id="tabla-conteos-laboratorio" class="tabla-desplazable"></div>
+                </div>
+              </div>
+              <div class="controles-replay">
+                <label for="modo-limite">Terminar al</label>
+                <select id="modo-limite" name="modoLimite">
+                  <option value="duracion">Cumplir una duración</option>
+                  <option value="cantidad">Atender una cantidad exacta</option>
+                </select>
+              </div>
+              <label class="campo-laboratorio" for="cantidad-pacientes">
+                <span>Cantidad exacta de pacientes</span>
+                <input id="cantidad-pacientes" name="cantidadPacientes" type="number" min="1" max="500" step="1">
+                <small>El máximo es 500 para conservar una simulación fluida.</small>
+              </label>
+              <label class="campo-laboratorio" for="duracion-laboratorio">
+                <span>Duración (min)</span>
+                <input id="duracion-laboratorio" name="duracionMin" type="number" min="0.001" max="1440" step="any">
+                <small>Tiempo contado desde las 08:00, hasta 24 horas.</small>
+              </label>
+              <label class="campo-laboratorio" for="proporcion-preferencial">
+                <span>Adultos mayores (%)</span>
+                <input id="proporcion-preferencial" name="proporcionPreferencial" type="number" min="0" max="100" step="any">
+                <small id="ayuda-proporcion">Fracción de las llegadas que serán de adultos mayores.</small>
+              </label>
+              <label class="campo-laboratorio" for="factor-demanda">
+                <span>Multiplicador de demanda</span>
+                <input id="factor-demanda" name="factorDemanda" type="number" min="0.1" max="10" step="0.1">
+                <small>1 conserva la demanda; 2 la duplica y 0,5 la reduce a la mitad.</small>
+              </label>
+            </fieldset>
+
+            <fieldset>
+              <legend>Tiempos de atención</legend>
+              <p class="ayuda">Los promedios iniciales y los datos empíricos provienen de las observaciones exportadas.</p>
+              <div id="atencion-laboratorio" class="bloque-laboratorio"></div>
+            </fieldset>
+
+            <fieldset>
+              <legend>Política de atención</legend>
+              <label class="campo-laboratorio" for="disciplina-laboratorio">
+                <span>Disciplina de la fila</span>
+                <select id="disciplina-laboratorio" name="disciplina">
+                  <option value="FIFO">FIFO: primero en llegar</option>
+                  <option value="prioridad_preferencial">Prioridad a adultos mayores</option>
+                </select>
+                <small>Decide quién pasa primero cuando una ventanilla queda libre.</small>
+              </label>
+              <label class="campo-laboratorio" for="colas-laboratorio">
+                <span>Organización de las filas</span>
+                <select id="colas-laboratorio" name="colas">
+                  <option value="separadas">Filas separadas por grupo</option>
+                  <option value="compartida">Una fila compartida</option>
+                </select>
+                <small>Una fila compartida puede ser atendida por cualquiera compatible.</small>
+              </label>
+              <label class="campo-laboratorio" for="asignacion-laboratorio">
+                <span>Ventanilla libre</span>
+                <select id="asignacion-laboratorio" name="asignacion_libres">
+                  <option value="aleatoria">Elegir aleatoriamente</option>
+                  <option value="primera_libre">Elegir la primera libre</option>
+                </select>
+                <small>Cómo decidir cuando varias ventanillas compatibles están libres.</small>
+              </label>
+            </fieldset>
+
+            <fieldset>
+              <legend>Criterio y semilla</legend>
+              <label class="campo-laboratorio" for="meta-espera">
+                <span>Meta de espera (min)</span>
+                <input id="meta-espera" name="meta" type="number" min="0" max="1440" step="any">
+                <small>Espera objetivo para evaluar el servicio.</small>
+              </label>
+              <label class="campo-laboratorio" for="maximo-espera">
+                <span>Máximo tolerable (min)</span>
+                <input id="maximo-espera" name="maximoTolerable" type="number" min="0" max="1440" step="any">
+                <small>Por encima de este tiempo, la espera se considera excesiva.</small>
+              </label>
+              <label class="campo-laboratorio" for="proporcion-permitida">
+                <span>Proporción permitida sobre el máximo (%)</span>
+                <input id="proporcion-permitida" name="proporcionPermitida" type="number" min="0" max="100" step="any">
+                <small>Porcentaje máximo de pacientes con espera excesiva.</small>
+              </label>
+              <label class="campo-laboratorio" for="semilla-laboratorio">
+                <span>Semilla reproducible</span>
+                <input id="semilla-laboratorio" name="semilla" type="number" min="0" max="2147483647" step="1">
+                <small>La misma semilla y configuración producen el mismo resultado.</small>
+              </label>
+              <button id="nueva-semilla" type="button">Nueva semilla</button>
+            </fieldset>
+
+            <div id="advertencias-laboratorio" aria-live="polite"></div>
+            <button id="simular-laboratorio" type="button">Simular y ver en 3D</button>
+            <button id="volver-observados" type="button" class="boton-secundario">
+              Volver a los datos observados
+            </button>
+            <p id="estado-laboratorio" class="estado" role="status" aria-live="polite">
+              Preparando el formulario…
+            </p>
+            <section id="resultados-laboratorio" class="resultados-laboratorio" hidden>
+              <h3>Medidas de esta corrida</h3>
+            </section>
+          </form>
+        </section>
+
         <section
           id="resultados-replay"
           class="panel panel-resultados"
@@ -155,23 +351,6 @@
             </table>
           </div>
           <p id="estado-comparacion" class="comparacion" role="status" aria-live="polite"></p>
-          <section
-            id="resumen-final-replay"
-            class="resumen-final"
-            aria-labelledby="titulo-resumen-final"
-            hidden
-          >
-            <h3 id="titulo-resumen-final">Resumen final de reproducción</h3>
-            <dl class="medidas">
-              <div><dt>Pacientes</dt><dd id="resumen-final-pacientes">—</dd></div>
-              <div><dt>Pacientes que esperaron</dt><dd id="resumen-final-esperaron">—</dd></div>
-              <div><dt>Wq</dt><dd id="resumen-final-wq">—</dd></div>
-            </dl>
-            <button id="descargar-csv" type="button" disabled>
-              Descargar CSV de pacientes
-            </button>
-            <p id="estado-csv" class="estado" role="status" aria-live="polite"></p>
-          </section>
           <details class="cifras-completas">
             <summary>Ver todas las cifras verificadas exportadas</summary>
             <dl id="lista-cifras"></dl>

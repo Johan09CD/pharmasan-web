@@ -231,14 +231,22 @@ export function crearRecorridoDesdeEventos(eventos) {
 }
 
 function buscarFotograma(fotogramas, tiempo) {
-  let anterior = null;
-  for (const fotograma of fotogramas) {
-    if (fotograma.tiempo > tiempo) {
-      break;
-    }
-    anterior = fotograma;
+  if (fotogramas.length === 0) {
+    return null;
   }
-  return anterior;
+  let lo = 0;
+  let hi = fotogramas.length - 1;
+  let resultado = null;
+  while (lo <= hi) {
+    const mid = (lo + hi) >>> 1;
+    if (fotogramas[mid].tiempo <= tiempo) {
+      resultado = fotogramas[mid];
+      lo = mid + 1;
+    } else {
+      hi = mid - 1;
+    }
+  }
+  return resultado;
 }
 
 export function obtenerFrameDesdeEventos(recorrido, tiempo) {

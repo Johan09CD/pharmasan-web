@@ -1,1 +1,1286 @@
-export {};
+import { calcularMetricas } from "../engine/metricas.js";
+import { crearFlujoAleatorio } from "../engine/prng.js";
+import { simular } from "../engine/simulador.js";
+import { normalEstandar } from "../engine/distribuciones.js";
+import { crearConfiguracionBase } from "./observados.js";
+
+const TIPOS = ["General", "Preferencial"];
+const MAXIMO_PACIENTES = 500;
+const MAXIMO_VENTANILLAS = 8;
+const formatoLocal = new Intl.NumberFormat("es-CO", {
+  maximumFractionDigits: 3,
+});
+const DISTRIBUCIONES = [
+  ["empirica", "Empírica observada"],
+  ["erlang", "Erlang"],
+  ["exponencial", "Exponencial"],
+  ["normal_truncada", "Normal truncada"],
+  ["constante", "Constante"],
+];
+const MODOS_LLEGADA = [
+  ["observados", "Patrones observados por grupo y día"],
+  ["poisson", "Tasa por hora de cada grupo (Poisson)"],
+  ["intervalo_fijo", "Tiempo entre llegadas fijo"],
+  ["intervalo_normal", "Tiempo entre llegadas con media y desviación"],
+  ["conteos", "Conteos observados por intervalo de 5 minutos"],
+];
+
+function promedio(valores) {
+  return valores.length
+    ? valores.reduce((suma, valor) => suma + valor, 0) / valores.length
+    : 0;
+}
+
+function exigirDatos(datos) {
+  if (
+    !datos ||
+    !Array.isArray(datos.pacientes) ||
+    !Array.isArray(datos.pico) ||
+    !Array.isArray(datos.llegadas?.conteos_5_min)
+  ) {
+    throw new TypeError(
+      "El laboratorio requiere datos observados con pico y conteos de cinco minutos.",
+    );
+  }
+}
+
+function intervalosObservadosPorGrupo(datos, semilla) {
+  return crearConfiguracionBase(datos, semilla).llegadas.tiempos_entre_llegadas;
+}
+
+function crearAtencionInicial(datos) {
+  return Object.fromEntries(
+    TIPOS.map((tipo) => {
+      const datosTipo = datos.atencion?.[tipo];
+      if (!datosTipo || !Array.isArray(datosTipo.valores_observados_min)) {
+        throw new RangeError(`Faltan tiempos de atención observados para ${tipo}.`);
+      }
+      return [
+        tipo,
+        {
+          dist: "erlang",
+          media: datosTipo.erlang.forma / datosTipo.erlang.tasa,
+          sd: datosTipo.desviacion_min,
+          k: datosTipo.erlang?.forma,
+        },
+      ];
+    }),
+  );
+}
+
+function crearConfiguracionVentanasPreajuste(nombre) {
+  const ventanillas = [
+    { id: 1, nombre: "Ventanilla 1", atiende: ["General"] },
+    { id: 2, nombre: "Ventanilla 2", atiende: ["General"] },
+    { id: 3, nombre: "Ventanilla 3", atiende: ["Preferencial"] },
+  ];
+  switch (nombre) {
+    case "Actual (2 generales + 1 preferencial)":
+      break;
+    case "Con apoyo":
+      ventanillas[2].atiende = ["Preferencial", "General"];
+      break;
+    case "Una sola cola compartida":
+      ventanillas.forEach(
+        (ventanilla) => (ventanilla.atiende = ["Preferencial", "General"]),
+      );
+      break;
+    case "Cuarta ventanilla":
+      ventanillas.push({
+        id: 4,
+        nombre: "Ventanilla 4",
+        atiende: ["General"],
+      });
+      break;
+    default:
+      throw new RangeError(`No existe el preajuste «${nombre}».`);
+  }
+  return ventanillas;
+}
+
+export function crearPreajusteLaboratorio(nombre, datos, semilla) {
+  exigirDatos(datos);
+  if (!Number.isInteger(semilla)) {
+    throw new TypeError("La semilla debe ser un número entero.");
+  }
+  const pico = new Set(datos.pico);
+  const cantidadPreferencial = datos.pacientes.filter(
+    (paciente) => pico.has(paciente.id) && paciente.tipo === "Preferencial",
+  ).length;
+  const interllegadas = intervalosObservadosPorGrupo(datos, semilla);
+  const intervaloMedio = promedio(
+    TIPOS.flatMap((tipo) => interllegadas[tipo]),
+  );
+  return {
+    nombre,
+    ventanillas: crearConfiguracionVentanasPreajuste(nombre),
+    modoLlegadas: "observados",
+    tasaGeneralHora: 60 / promedio(interllegadas.General),
+    tasaPreferencialHora: 60 / promedio(interllegadas.Preferencial),
+    intervaloMedia: intervaloMedio,
+    intervaloDesviacion: 0,
+    modoLimite: "duracion",
+    cantidadPacientes: datos.pico.length,
+    duracionMin: 60,
+    proporcionPreferencial:
+      datos.pico.length === 0 ? 0 : cantidadPreferencial / datos.pico.length,
+    factorDemanda: 1,
+    diaConteos: datos.llegadas.conteos_5_min[0]?.dia ?? "",
+    conteos: datos.llegadas.conteos_5_min.map((intervalo) => ({
+      ...intervalo,
+    })),
+    atencion: crearAtencionInicial(datos),
+    disciplina: "FIFO",
+    colas: nombre === "Una sola cola compartida" ? "compartida" : "separadas",
+    asignacion_libres: "aleatoria",
+    meta: 2,
+    maximoTolerable: 5,
+    proporcionPermitida: 5,
+    semilla,
+  };
+}
+
+function numeroFinito(valor) {
+  return Number.isFinite(valor);
+}
+
+function agregarError(errores, campo, mensaje) {
+  errores.push({ campo, mensaje });
+}
+
+function tasaPorGrupo(entrada, datos) {
+  const factor = entrada.factorDemanda;
+  if (!numeroFinito(factor) || factor <= 0) {
+    return { General: 0, Preferencial: 0 };
+  }
+  if (entrada.modoLlegadas === "poisson") {
+    return {
+      General: (entrada.tasaGeneralHora * factor) / 60,
+      Preferencial: (entrada.tasaPreferencialHora * factor) / 60,
+    };
+  }
+  if (
+    ["intervalo_fijo", "intervalo_normal"].includes(entrada.modoLlegadas)
+  ) {
+    const total =
+      numeroFinito(entrada.intervaloMedia) && entrada.intervaloMedia > 0
+        ? factor / entrada.intervaloMedia
+        : 0;
+    return {
+      General: total * (1 - entrada.proporcionPreferencial),
+      Preferencial: total * entrada.proporcionPreferencial,
+    };
+  }
+  if (entrada.modoLlegadas === "conteos") {
+    const filas = entrada.conteos?.filter(
+      (fila) => fila.dia === entrada.diaConteos,
+    );
+    if (!filas?.length) return { General: 0, Preferencial: 0 };
+    const inicio = Math.min(...filas.map((fila) => fila.inicio_min));
+    const fin = Math.max(...filas.map((fila) => fila.fin_min));
+    const duracion = fin - inicio;
+    return Object.fromEntries(
+      TIPOS.map((tipo) => [
+        tipo,
+        duracion > 0
+          ? (filas
+              .filter((fila) => fila.tipo === tipo)
+              .reduce((suma, fila) => suma + fila.llegadas, 0) *
+              factor) /
+            duracion
+          : 0,
+      ]),
+    );
+  }
+  if (entrada.modoLlegadas !== "observados") {
+    return { General: 0, Preferencial: 0 };
+  }
+  const intervalos = intervalosObservadosPorGrupo(datos, entrada.semilla);
+  return Object.fromEntries(
+    TIPOS.map((tipo) => [
+      tipo,
+      intervalos[tipo].length ? factor / promedio(intervalos[tipo]) : 0,
+    ]),
+  );
+}
+
+function mediaAtencion(entrada, datos, tipo) {
+  const parametros = entrada.atencion?.[tipo];
+  if (parametros?.dist === "empirica") {
+    return promedio(datos.atencion[tipo].valores_observados_min);
+  }
+  return parametros?.media ?? 0;
+}
+
+export function validarEntradaLaboratorio(entrada, datos) {
+  const errores = [];
+  const advertencias = [];
+  if (!entrada || typeof entrada !== "object") {
+    return {
+      errores: [
+        {
+          campo: "formulario",
+          mensaje: "Completa la configuración del laboratorio.",
+        },
+      ],
+      advertencias,
+      rhoEstimado: 0,
+    };
+  }
+
+  if (
+    !Array.isArray(entrada.ventanillas) ||
+    entrada.ventanillas.length < 1 ||
+    entrada.ventanillas.length > MAXIMO_VENTANILLAS
+  ) {
+    agregarError(
+      errores,
+      "ventanillas",
+      `Configura entre 1 y ${MAXIMO_VENTANILLAS} ventanillas.`,
+    );
+  } else {
+    entrada.ventanillas.forEach((ventanilla, indice) => {
+      if (
+        typeof ventanilla.nombre !== "string" ||
+        ventanilla.nombre.trim().length === 0 ||
+        ventanilla.nombre.length > 40
+      ) {
+        agregarError(
+          errores,
+          `ventanillas.${indice}.nombre`,
+          "Escribe un nombre de hasta 40 caracteres.",
+        );
+      }
+      if (
+        !Array.isArray(ventanilla.atiende) ||
+        ventanilla.atiende.length === 0 ||
+        new Set(ventanilla.atiende).size !== ventanilla.atiende.length ||
+        ventanilla.atiende.some((tipo) => !TIPOS.includes(tipo))
+      ) {
+        agregarError(
+          errores,
+          `ventanillas.${indice}.atiende`,
+          "Elige al menos un grupo y no repitas opciones.",
+        );
+      }
+    });
+    for (const tipo of TIPOS) {
+      if (!entrada.ventanillas.some((ventanilla) => ventanilla.atiende.includes(tipo))) {
+        agregarError(
+          errores,
+          "ventanillas",
+          `Ninguna ventanilla puede atender al grupo ${tipo}.`,
+        );
+      }
+    }
+  }
+
+  if (!MODOS_LLEGADA.some(([modo]) => modo === entrada.modoLlegadas)) {
+    agregarError(errores, "modoLlegadas", "Selecciona un modo de llegadas válido.");
+  }
+  if (entrada.modoLlegadas === "poisson") {
+    for (const [campo, valor] of [
+      ["tasaGeneralHora", entrada.tasaGeneralHora],
+      ["tasaPreferencialHora", entrada.tasaPreferencialHora],
+    ]) {
+      if (!numeroFinito(valor) || valor < 0 || valor > 3000) {
+        agregarError(
+          errores,
+          campo,
+          "La tasa debe estar entre 0 y 3.000 pacientes por hora.",
+        );
+      }
+    }
+    if (
+      numeroFinito(entrada.tasaGeneralHora) &&
+      numeroFinito(entrada.tasaPreferencialHora) &&
+      entrada.tasaGeneralHora + entrada.tasaPreferencialHora === 0
+    ) {
+      agregarError(
+        errores,
+        "tasaGeneralHora",
+        "Al menos un grupo debe tener tasa positiva.",
+      );
+    }
+  }
+  if (["intervalo_fijo", "intervalo_normal"].includes(entrada.modoLlegadas)) {
+    if (
+      !numeroFinito(entrada.intervaloMedia) ||
+      entrada.intervaloMedia <= 0 ||
+      entrada.intervaloMedia > 10000
+    ) {
+      agregarError(
+        errores,
+        "intervaloMedia",
+        "La media entre llegadas debe ser mayor que 0 y no superar 10.000 min.",
+      );
+    }
+    if (
+      entrada.modoLlegadas === "intervalo_normal" &&
+      (!numeroFinito(entrada.intervaloDesviacion) ||
+        entrada.intervaloDesviacion < 0 ||
+        entrada.intervaloDesviacion > 10000)
+    ) {
+      agregarError(
+        errores,
+        "intervaloDesviacion",
+        "La desviación debe estar entre 0 y 10.000 min.",
+      );
+    }
+  }
+  if (entrada.modoLlegadas === "conteos") {
+    const filas = entrada.conteos?.filter(
+      (fila) => fila.dia === entrada.diaConteos,
+    );
+    if (!filas?.length) {
+      agregarError(
+        errores,
+        "conteos",
+        "No hay intervalos observados para el día elegido.",
+      );
+    } else {
+      filas.forEach((fila, indice) => {
+        if (
+          !Number.isInteger(fila.llegadas) ||
+          fila.llegadas < 0 ||
+          !numeroFinito(fila.inicio_min) ||
+          !numeroFinito(fila.fin_min) ||
+          fila.fin_min <= fila.inicio_min ||
+          !TIPOS.includes(fila.tipo)
+        ) {
+          agregarError(
+            errores,
+            `conteos.${indice}`,
+            "Cada conteo debe ser entero no negativo y tener grupo e intervalo válidos.",
+          );
+        }
+      });
+    }
+  }
+
+  if (!["cantidad", "duracion"].includes(entrada.modoLimite)) {
+    agregarError(errores, "modoLimite", "Elige limitar por pacientes o duración.");
+  } else if (entrada.modoLimite === "cantidad") {
+    if (
+      !Number.isInteger(entrada.cantidadPacientes) ||
+      entrada.cantidadPacientes < 1 ||
+      entrada.cantidadPacientes > MAXIMO_PACIENTES
+    ) {
+      agregarError(
+        errores,
+        "cantidadPacientes",
+        `La cantidad debe estar entre 1 y ${MAXIMO_PACIENTES} pacientes.`,
+      );
+    }
+  } else if (
+    !numeroFinito(entrada.duracionMin) ||
+    entrada.duracionMin <= 0 ||
+    entrada.duracionMin > 1440
+  ) {
+    agregarError(
+      errores,
+      "duracionMin",
+      "La duración debe ser mayor que 0 y no superar 1.440 min.",
+    );
+  }
+  if (
+    !numeroFinito(entrada.proporcionPreferencial) ||
+    entrada.proporcionPreferencial < 0 ||
+    entrada.proporcionPreferencial > 1
+  ) {
+    agregarError(
+      errores,
+      "proporcionPreferencial",
+      "La proporción de adultos mayores debe estar entre 0 % y 100 %.",
+    );
+  }
+  if (
+    !numeroFinito(entrada.factorDemanda) ||
+    entrada.factorDemanda < 0.1 ||
+    entrada.factorDemanda > 10
+  ) {
+    agregarError(
+      errores,
+      "factorDemanda",
+      "El factor de demanda debe estar entre 0,1 y 10.",
+    );
+  }
+
+  for (const tipo of TIPOS) {
+    const parametros = entrada.atencion?.[tipo];
+    if (!parametros || !DISTRIBUCIONES.some(([dist]) => dist === parametros.dist)) {
+      agregarError(
+        errores,
+        `atencion.${tipo}.dist`,
+        `Elige una distribución de atención para ${tipo}.`,
+      );
+      continue;
+    }
+    if (
+      parametros.dist !== "empirica" &&
+      (!numeroFinito(parametros.media) ||
+        parametros.media <= 0 ||
+        parametros.media > 1440)
+    ) {
+      agregarError(
+        errores,
+        `atencion.${tipo}.media`,
+        `La media de ${tipo} debe estar entre 0 y 1.440 min.`,
+      );
+    }
+    if (
+      parametros.dist === "normal_truncada" &&
+      (!numeroFinito(parametros.sd) ||
+        parametros.sd < 0 ||
+        parametros.sd > 1440)
+    ) {
+      agregarError(
+        errores,
+        `atencion.${tipo}.sd`,
+        `La desviación de ${tipo} debe estar entre 0 y 1.440 min.`,
+      );
+    }
+    if (
+      parametros.dist === "erlang" &&
+      (!Number.isInteger(parametros.k) || parametros.k < 1 || parametros.k > 1000)
+    ) {
+      agregarError(
+        errores,
+        `atencion.${tipo}.k`,
+        "La forma Erlang debe ser un entero entre 1 y 1.000.",
+      );
+    }
+  }
+
+  if (!["FIFO", "prioridad_preferencial"].includes(entrada.disciplina)) {
+    agregarError(errores, "disciplina", "Selecciona FIFO o prioridad preferencial.");
+  }
+  if (!["separadas", "compartida"].includes(entrada.colas)) {
+    agregarError(errores, "colas", "Selecciona filas separadas o una fila compartida.");
+  }
+  if (!["aleatoria", "primera_libre"].includes(entrada.asignacion_libres)) {
+    agregarError(errores, "asignacion_libres", "Selecciona una regla de asignación válida.");
+  }
+  if (
+    !Number.isInteger(entrada.semilla) ||
+    entrada.semilla < 0 ||
+    entrada.semilla > 2147483647
+  ) {
+    agregarError(
+      errores,
+      "semilla",
+      "La semilla debe ser un entero entre 0 y 2.147.483.647.",
+    );
+  }
+  if (!numeroFinito(entrada.meta) || entrada.meta < 0 || entrada.meta > 1440) {
+    agregarError(errores, "meta", "La meta debe estar entre 0 y 1.440 min.");
+  }
+  if (
+    !numeroFinito(entrada.maximoTolerable) ||
+    entrada.maximoTolerable < entrada.meta ||
+    entrada.maximoTolerable > 1440
+  ) {
+    agregarError(
+      errores,
+      "maximoTolerable",
+      "El máximo tolerable debe ser al menos la meta y no superar 1.440 min.",
+    );
+  }
+  if (
+    !numeroFinito(entrada.proporcionPermitida) ||
+    entrada.proporcionPermitida < 0 ||
+    entrada.proporcionPermitida > 100
+  ) {
+    agregarError(
+      errores,
+      "proporcionPermitida",
+      "La proporción permitida debe estar entre 0 % y 100 %.",
+    );
+  }
+
+  let rhoEstimado = 0;
+  if (errores.length === 0 && datos) {
+    const tasas = tasaPorGrupo(entrada, datos);
+    const cargaTotal = TIPOS.reduce(
+      (suma, tipo) => suma + tasas[tipo] * mediaAtencion(entrada, datos, tipo),
+      0,
+    );
+    const cargaPorGrupo = TIPOS.map((tipo) => {
+      const compatibles = entrada.ventanillas.filter((ventanilla) =>
+        ventanilla.atiende.includes(tipo),
+      ).length;
+      return (tasas[tipo] * mediaAtencion(entrada, datos, tipo)) / compatibles;
+    });
+    rhoEstimado = Math.max(
+      ...cargaPorGrupo,
+      cargaTotal / entrada.ventanillas.length,
+    );
+    if (rhoEstimado >= 1) {
+      advertencias.push(
+        `La carga estimada es rho ≈ ${formatoLocal.format(rhoEstimado)} (≥ 1); la cola puede crecer sin estabilizarse. Puedes simular de todas formas.`,
+      );
+    }
+    const estimado =
+      entrada.modoLimite === "cantidad"
+        ? entrada.cantidadPacientes
+        : Object.values(tasas).reduce((suma, valor) => suma + valor, 0) *
+          entrada.duracionMin;
+    if (numeroFinito(estimado) && estimado > MAXIMO_PACIENTES) {
+      advertencias.push(
+        `La demanda estimada supera ${MAXIMO_PACIENTES} pacientes; la corrida se limitará a ese máximo.`,
+      );
+    }
+  }
+  return { errores, advertencias, rhoEstimado };
+}
+
+function exigirEntradaValida(entrada, datos) {
+  const validacion = validarEntradaLaboratorio(entrada, datos);
+  if (validacion.errores.length) {
+    throw new RangeError(validacion.errores[0].mensaje);
+  }
+  return validacion;
+}
+
+function crearLlegadasExplicitas(entrada) {
+  const aleatorioIntervalo = crearFlujoAleatorio(
+    entrada.semilla,
+    "laboratorio:intervalos",
+  );
+  const aleatorioTipo = crearFlujoAleatorio(
+    entrada.semilla,
+    "laboratorio:tipos",
+  );
+  const cantidadMaxima =
+    entrada.modoLimite === "cantidad"
+      ? entrada.cantidadPacientes
+      : MAXIMO_PACIENTES;
+  const llegadas = [];
+  let tiempo = 0;
+  while (llegadas.length < cantidadMaxima) {
+    let intervalo = entrada.intervaloMedia;
+    if (
+      entrada.modoLlegadas === "intervalo_normal" &&
+      entrada.intervaloDesviacion > 0
+    ) {
+      let intentos = 0;
+      do {
+        intervalo =
+          entrada.intervaloMedia +
+          entrada.intervaloDesviacion * normalEstandar(aleatorioIntervalo);
+        intentos += 1;
+        if (intentos > 1000) {
+          throw new RangeError(
+            "No fue posible generar un intervalo positivo; reduce la desviación o aumenta la media.",
+          );
+        }
+      } while (intervalo <= 0);
+    }
+    tiempo += intervalo / entrada.factorDemanda;
+    if (entrada.modoLimite === "duracion" && tiempo > entrada.duracionMin) {
+      break;
+    }
+    llegadas.push({
+      id: `Paciente ${llegadas.length + 1}`,
+      tipo:
+        aleatorioTipo() < entrada.proporcionPreferencial
+          ? "Preferencial"
+          : "General",
+      llegada: tiempo,
+    });
+  }
+  return llegadas;
+}
+
+function crearLlegadasLaboratorio(entrada, datos) {
+  if (entrada.modoLlegadas === "poisson") {
+    return {
+      modo: "poisson",
+      tasas_por_minuto: {
+        General: (entrada.tasaGeneralHora * entrada.factorDemanda) / 60,
+        Preferencial:
+          (entrada.tasaPreferencialHora * entrada.factorDemanda) / 60,
+      },
+    };
+  }
+  if (entrada.modoLlegadas === "observados") {
+    const llegadasBase = intervalosObservadosPorGrupo(datos, entrada.semilla);
+    return {
+      modo: "intervalos",
+      tiempos_entre_llegadas: Object.fromEntries(
+        TIPOS.map((tipo) => [
+          tipo,
+          llegadasBase[tipo].map(
+            (intervalo) => intervalo / entrada.factorDemanda,
+          ),
+        ]),
+      ),
+    };
+  }
+  if (entrada.modoLlegadas === "conteos") {
+    const filas = entrada.conteos
+      .filter((intervalo) => intervalo.dia === entrada.diaConteos)
+      .map((intervalo) => ({
+        ...intervalo,
+        demanda: intervalo.llegadas * entrada.factorDemanda,
+      }));
+    const total = filas.reduce((suma, fila) => suma + fila.demanda, 0);
+    const meta = Math.min(MAXIMO_PACIENTES, Math.round(total));
+    const escala = total > 0 ? meta / total : 0;
+    const partes = filas.map((fila) => {
+      const exacto = fila.demanda * escala;
+      const cantidad = Math.floor(exacto);
+      return { fila, cantidad, resto: exacto - cantidad };
+    });
+    const restante =
+      meta - partes.reduce((suma, parte) => suma + parte.cantidad, 0);
+    partes
+      .toSorted((a, b) => b.resto - a.resto)
+      .slice(0, restante)
+      .forEach((parte) => (parte.cantidad += 1));
+    return {
+      modo: "conteos",
+      dia: entrada.diaConteos,
+      intervalos: partes.map(({ fila, cantidad }) => ({
+        ...fila,
+        llegadas: cantidad,
+      })),
+    };
+  }
+  return {
+    modo: "intervalos",
+    tiempos_llegada: crearLlegadasExplicitas(entrada),
+  };
+}
+
+export function crearConfiguracionLaboratorio(entrada, datos) {
+  exigirDatos(datos);
+  const validacion = exigirEntradaValida(entrada, datos);
+  const configuracion = {
+    ventanillas: entrada.ventanillas.map((ventanilla, indice) => ({
+      id: indice + 1,
+      nombre: ventanilla.nombre.trim(),
+      atiende: [...ventanilla.atiende],
+    })),
+    llegadas: crearLlegadasLaboratorio(entrada, datos),
+    atencion: Object.fromEntries(
+      TIPOS.map((tipo) => {
+        const parametros = entrada.atencion[tipo];
+        if (parametros.dist === "empirica") {
+          return [
+            tipo,
+            {
+              dist: "empirica",
+              media: promedio(datos.atencion[tipo].valores_observados_min),
+              valores: [...datos.atencion[tipo].valores_observados_min],
+            },
+          ];
+        }
+        return [
+          tipo,
+          {
+            dist: parametros.dist,
+            media: parametros.media,
+            sd: parametros.sd,
+            k: parametros.k,
+          },
+        ];
+      }),
+    ),
+    disciplina: entrada.disciplina,
+    colas: entrada.colas,
+    asignacion_libres: entrada.asignacion_libres,
+    semilla: entrada.semilla,
+  };
+  if (entrada.modoLimite === "cantidad") {
+    configuracion.cantidad_pacientes = entrada.cantidadPacientes;
+  } else {
+    configuracion.horizonte_min = entrada.duracionMin;
+    configuracion.cantidad_pacientes = MAXIMO_PACIENTES;
+  }
+  return {
+    configuracion,
+    criterio: {
+      meta: entrada.meta,
+      maximo_tolerable: entrada.maximoTolerable,
+      proporcion_permitida: entrada.proporcionPermitida / 100,
+    },
+    rhoEstimado: validacion.rhoEstimado,
+    advertencias: validacion.advertencias,
+  };
+}
+
+function nodo(etiqueta, atributos = {}) {
+  const elemento = document.createElement(etiqueta);
+  for (const [nombre, valor] of Object.entries(atributos)) {
+    if (nombre === "texto") elemento.textContent = valor;
+    else if (nombre === "clase") elemento.className = valor;
+    else elemento.setAttribute(nombre, valor);
+  }
+  return elemento;
+}
+
+function control(formulario, nombre) {
+  return formulario.elements.namedItem(nombre);
+}
+
+function entradaCampo(etiqueta, nombre, tipo, valor, ayuda, opciones = {}) {
+  const envoltura = nodo("label", { clase: "campo-laboratorio" });
+  const titulo = nodo("span", { texto: etiqueta });
+  const campo =
+    tipo === "select" ? document.createElement("select") : nodo("input", { type: tipo });
+  campo.name = nombre;
+  if (tipo !== "select") campo.value = String(valor ?? "");
+  if (tipo === "number") {
+    campo.step = opciones.step ?? "any";
+    if (opciones.min !== undefined) campo.min = String(opciones.min);
+    if (opciones.max !== undefined) campo.max = String(opciones.max);
+  }
+  for (const opcion of opciones.opciones ?? []) {
+    campo.append(nodo("option", { value: opcion.valor, texto: opcion.texto }));
+  }
+  if (tipo === "select") campo.value = String(valor);
+  envoltura.append(titulo, campo, nodo("small", { texto: ayuda }));
+  return { envoltura, campo };
+}
+
+function numero(formulario, nombre) {
+  return control(formulario, nombre)?.valueAsNumber ?? Number.NaN;
+}
+
+function claveConteo(fila) {
+  return `${fila.dia}|${fila.tipo}|${fila.intervalo}`;
+}
+
+function leerEntrada(formulario, conteosBase = []) {
+  const ventanillas = [
+    ...formulario.querySelectorAll(".ventanilla-laboratorio"),
+  ].map((tarjeta) => {
+    const orden = tarjeta.querySelector('select[name$=".atiende"]').value;
+    return {
+      nombre: tarjeta.querySelector('input[name$=".nombre"]').value,
+      atiende:
+        orden === "General primero"
+          ? ["General", "Preferencial"]
+          : orden === "Preferencial primero"
+            ? ["Preferencial", "General"]
+            : [orden],
+    };
+  });
+  const conteos = new Map(
+    conteosBase.map((fila) => [claveConteo(fila), { ...fila }]),
+  );
+  for (const campo of formulario.querySelectorAll("[data-conteo]")) {
+    const fila = JSON.parse(campo.dataset.conteo);
+    conteos.set(claveConteo(fila), { ...fila, llegadas: campo.valueAsNumber });
+  }
+  return {
+    ventanillas,
+    modoLlegadas: control(formulario, "modoLlegadas").value,
+    tasaGeneralHora: numero(formulario, "tasaGeneralHora"),
+    tasaPreferencialHora: numero(formulario, "tasaPreferencialHora"),
+    intervaloMedia: numero(formulario, "intervaloMedia"),
+    intervaloDesviacion: numero(formulario, "intervaloDesviacion"),
+    modoLimite: control(formulario, "modoLimite").value,
+    cantidadPacientes: numero(formulario, "cantidadPacientes"),
+    duracionMin: numero(formulario, "duracionMin"),
+    proporcionPreferencial:
+      numero(formulario, "proporcionPreferencial") / 100,
+    factorDemanda: numero(formulario, "factorDemanda"),
+    diaConteos: control(formulario, "diaConteos").value,
+    conteos: [...conteos.values()],
+    atencion: Object.fromEntries(
+      TIPOS.map((tipo) => [
+        tipo,
+        {
+          dist: control(formulario, `atencion.${tipo}.dist`).value,
+          media: numero(formulario, `atencion.${tipo}.media`),
+          sd: numero(formulario, `atencion.${tipo}.sd`),
+          k: numero(formulario, `atencion.${tipo}.k`),
+        },
+      ]),
+    ),
+    disciplina: control(formulario, "disciplina").value,
+    colas: control(formulario, "colas").value,
+    asignacion_libres: control(formulario, "asignacion_libres").value,
+    meta: numero(formulario, "meta"),
+    maximoTolerable: numero(formulario, "maximoTolerable"),
+    proporcionPermitida: numero(formulario, "proporcionPermitida"),
+    semilla: numero(formulario, "semilla"),
+  };
+}
+
+function renderizarVentanillas(formulario, ventanillas) {
+  const contenedor = formulario.querySelector("#laboratorio-ventanillas");
+  contenedor.replaceChildren();
+  for (const [indice, ventanilla] of ventanillas.entries()) {
+    const tarjeta = nodo("fieldset", {
+      clase: "ventanilla-laboratorio",
+      "data-indice": String(indice),
+    });
+    tarjeta.append(nodo("legend", { texto: `Ventanilla ${indice + 1}` }));
+    const nombre = entradaCampo(
+      "Nombre",
+      `ventanillas.${indice}.nombre`,
+      "text",
+      ventanilla.nombre,
+      "Identifica esta ventanilla en la escena.",
+    );
+    nombre.campo.maxLength = 40;
+    const modo =
+      ventanilla.atiende.length === 1
+        ? ventanilla.atiende[0]
+        : ventanilla.atiende[0] === "Preferencial"
+          ? "Preferencial primero"
+          : "General primero";
+    const atiende = entradaCampo(
+      "Atiende",
+      `ventanillas.${indice}.atiende`,
+      "select",
+      modo,
+      "El orden en “ambos” define la prioridad de esta ventanilla.",
+      {
+        opciones: [
+          { valor: "General", texto: "General" },
+          { valor: "Preferencial", texto: "Adulto mayor" },
+          { valor: "General primero", texto: "Ambos · General primero" },
+          {
+            valor: "Preferencial primero",
+            texto: "Ambos · Adulto mayor primero",
+          },
+        ],
+      },
+    );
+    tarjeta.append(nombre.envoltura, atiende.envoltura);
+    const acciones = nodo("div", { clase: "acciones-ventanilla" });
+    const duplicar = nodo("button", {
+      type: "button",
+      "data-accion-ventanilla": "duplicar",
+      texto: "Duplicar",
+    });
+    duplicar.disabled = ventanillas.length >= MAXIMO_VENTANILLAS;
+    const quitar = nodo("button", {
+      type: "button",
+      "data-accion-ventanilla": "quitar",
+      texto: "Quitar",
+    });
+    quitar.disabled = ventanillas.length <= 1;
+    acciones.append(duplicar, quitar);
+    tarjeta.append(acciones);
+    contenedor.append(tarjeta);
+  }
+}
+
+function renderizarConteos(formulario, conteos, dia) {
+  const contenedor = formulario.querySelector("#tabla-conteos-laboratorio");
+  contenedor.replaceChildren();
+  const tabla = nodo("table");
+  tabla.append(
+    nodo("caption", {
+      texto: `Conteos observados de ${dia}; modifica los números para probar otro escenario.`,
+    }),
+  );
+  const cabeza = nodo("thead");
+  const filaCabeza = nodo("tr");
+  for (const texto of ["Hora", "Grupo", "Llegadas"]) {
+    filaCabeza.append(nodo("th", { scope: "col", texto }));
+  }
+  cabeza.append(filaCabeza);
+  const cuerpo = nodo("tbody");
+  for (const intervalo of conteos.filter((fila) => fila.dia === dia)) {
+    const fila = nodo("tr");
+    const celda = nodo("td");
+    const campo = nodo("input", {
+      type: "number",
+      min: "0",
+      max: String(MAXIMO_PACIENTES),
+      step: "1",
+      "data-conteo": "",
+    });
+    campo.value = String(intervalo.llegadas);
+    campo.dataset.conteo = JSON.stringify(intervalo);
+    campo.setAttribute(
+      "aria-label",
+      `${intervalo.etiqueta}, ${intervalo.tipo}`,
+    );
+    celda.append(campo);
+    fila.append(
+      nodo("td", { texto: intervalo.etiqueta }),
+      nodo("td", {
+        texto: intervalo.tipo === "Preferencial" ? "Adulto mayor" : "General",
+      }),
+      celda,
+    );
+    cuerpo.append(fila);
+  }
+  tabla.append(cabeza, cuerpo);
+  contenedor.append(tabla);
+}
+
+function renderizarAtencion(formulario, estado) {
+  const contenedor = formulario.querySelector("#atencion-laboratorio");
+  contenedor.replaceChildren();
+  for (const tipo of TIPOS) {
+    const tarjeta = nodo("fieldset", {
+      clase: "atencion-laboratorio",
+      "data-atencion": tipo,
+    });
+    tarjeta.append(
+      nodo("legend", {
+        texto: tipo === "Preferencial" ? "Adulto mayor" : "General",
+      }),
+    );
+    const parametros = estado.atencion[tipo];
+    tarjeta.append(
+      entradaCampo(
+        "Distribución",
+        `atencion.${tipo}.dist`,
+        "select",
+        parametros.dist,
+        "Elige la forma de representar el tiempo de atención.",
+        {
+          opciones: DISTRIBUCIONES.map(([valor, texto]) => ({ valor, texto })),
+        },
+      ).envoltura,
+      entradaCampo(
+        "Media (min)",
+        `atencion.${tipo}.media`,
+        "number",
+        parametros.media,
+        "Tiempo promedio de atención.",
+        { min: 0.001, max: 1440 },
+      ).envoltura,
+      entradaCampo(
+        "Desviación (min)",
+        `atencion.${tipo}.sd`,
+        "number",
+        parametros.sd ?? 0,
+        "Cuánto varía la duración alrededor de la media.",
+        { min: 0, max: 1440 },
+      ).envoltura,
+      entradaCampo(
+        "Forma Erlang k",
+        `atencion.${tipo}.k`,
+        "number",
+        parametros.k ?? 1,
+        "Más etapas producen servicios menos variables.",
+        { min: 1, max: 1000, step: 1 },
+      ).envoltura,
+    );
+    contenedor.append(tarjeta);
+  }
+}
+
+function aplicarEstado(formulario, estado) {
+  for (const [nombre, valor] of Object.entries({
+    modoLlegadas: estado.modoLlegadas,
+    tasaGeneralHora: estado.tasaGeneralHora,
+    tasaPreferencialHora: estado.tasaPreferencialHora,
+    intervaloMedia: estado.intervaloMedia,
+    intervaloDesviacion: estado.intervaloDesviacion,
+    modoLimite: estado.modoLimite,
+    cantidadPacientes: estado.cantidadPacientes,
+    duracionMin: estado.duracionMin,
+    proporcionPreferencial: estado.proporcionPreferencial * 100,
+    factorDemanda: estado.factorDemanda,
+    diaConteos: estado.diaConteos,
+    disciplina: estado.disciplina,
+    colas: estado.colas,
+    asignacion_libres: estado.asignacion_libres,
+    meta: estado.meta,
+    maximoTolerable: estado.maximoTolerable,
+    proporcionPermitida: estado.proporcionPermitida,
+    semilla: estado.semilla,
+  })) {
+    control(formulario, nombre).value = String(valor ?? "");
+  }
+  control(formulario, "nombre_preajuste").value = estado.nombre;
+  renderizarVentanillas(formulario, estado.ventanillas);
+  renderizarAtencion(formulario, estado);
+  renderizarConteos(formulario, estado.conteos, estado.diaConteos);
+  actualizarVisibilidad(formulario);
+}
+
+function actualizarVisibilidad(formulario) {
+  const modo = control(formulario, "modoLlegadas").value;
+  for (const bloque of formulario.querySelectorAll("[data-modo-llegada]")) {
+    bloque.hidden = !bloque.dataset.modoLlegada.split(" ").includes(modo);
+  }
+  const modoLimite = control(formulario, "modoLimite").value;
+  formulario.querySelector('[name="cantidadPacientes"]').closest("label").hidden =
+    modoLimite !== "cantidad";
+  formulario.querySelector('[name="duracionMin"]').closest("label").hidden =
+    modoLimite !== "duracion";
+  for (const tipo of TIPOS) {
+    const dist = control(formulario, `atencion.${tipo}.dist`).value;
+    formulario.querySelector(
+      `[data-atencion="${tipo}"] [name="atencion.${tipo}.media"]`,
+    ).closest("label").hidden = dist === "empirica";
+    formulario.querySelector(
+      `[data-atencion="${tipo}"] [name="atencion.${tipo}.sd"]`,
+    ).closest("label").hidden = dist !== "normal_truncada";
+    formulario.querySelector(
+      `[data-atencion="${tipo}"] [name="atencion.${tipo}.k"]`,
+    ).closest("label").hidden = dist !== "erlang";
+  }
+  const proporcion = control(formulario, "proporcionPreferencial");
+  proporcion.disabled = ["observados", "conteos", "poisson"].includes(modo);
+  formulario.querySelector("#ayuda-proporcion").textContent =
+    modo === "observados"
+      ? "Se conserva la proporción propia de los patrones observados por grupo y día."
+      : modo === "conteos"
+        ? "Los conteos editables ya indican el grupo de cada llegada."
+        : modo === "poisson"
+          ? "Las tasas independientes de cada grupo determinan la proporción."
+          : "Fracción de las llegadas que serán de adultos mayores.";
+  formulario.querySelector("#ayuda-conteos-dia").hidden = modo !== "conteos";
+  formulario.querySelector("#ayuda-conteos-tabla").hidden = modo !== "conteos";
+}
+
+function limpiarErrores(formulario) {
+  formulario.querySelectorAll("[aria-invalid]").forEach((campo) =>
+    campo.removeAttribute("aria-invalid"),
+  );
+  formulario.querySelectorAll(".campo-con-error").forEach((campo) =>
+    campo.classList.remove("campo-con-error"),
+  );
+  formulario.querySelectorAll(".error-campo").forEach((texto) => texto.remove());
+}
+
+function mostrarErrores(formulario, errores) {
+  limpiarErrores(formulario);
+  for (const error of errores) {
+    const campo = formulario.querySelector(`[name="${error.campo}"]`);
+    const destino =
+      campo?.closest("label, fieldset") ??
+      (error.campo.startsWith("ventanillas")
+        ? formulario.querySelector("#laboratorio-ventanillas")
+        : error.campo.startsWith("conteos")
+          ? formulario.querySelector("#tabla-conteos-laboratorio")
+          : formulario.querySelector("#laboratorio-configuracion"));
+    campo?.setAttribute("aria-invalid", "true");
+    destino?.classList.add("campo-con-error");
+    if (destino) {
+      destino.append(nodo("small", { clase: "error-campo", texto: error.mensaje }));
+    }
+  }
+}
+
+function mostrarMetricas(contenedor, metricas, rhoEstimado, advertencias) {
+  contenedor.replaceChildren();
+  contenedor.append(nodo("h3", { texto: "Medidas de esta corrida" }));
+  const lista = nodo("dl", { clase: "medidas" });
+  const medidas = [
+    ["Pacientes", String(metricas.n)],
+    ["Wq", `${formatoLocal.format(metricas.Wq)} min`],
+    ["W", `${formatoLocal.format(metricas.W)} min`],
+    ["Lq", formatoLocal.format(metricas.Lq)],
+    ["L", formatoLocal.format(metricas.L)],
+    ["Utilización global", `${formatoLocal.format(100 * metricas.rho_global)} %`],
+    ["Probabilidad de esperar", `${formatoLocal.format(100 * metricas.P_esperar)} %`],
+    [
+      "Sobre máximo tolerable",
+      `${formatoLocal.format(metricas.porcentaje_espera_mayor_tolerable)} %`,
+    ],
+    ["Cola máxima", String(metricas.cola_maxima)],
+    ["Criterio", metricas.criterio.cumple ? "Cumple" : "No cumple"],
+  ];
+  for (const [nombre, valor] of medidas) {
+    const bloque = nodo("div");
+    bloque.append(nodo("dt", { texto: nombre }), nodo("dd", { texto: valor }));
+    lista.append(bloque);
+  }
+  contenedor.append(lista);
+  if (rhoEstimado >= 1) {
+    contenedor.append(
+      nodo("p", {
+        clase: "estado estado-advertencia",
+        texto:
+          advertencias.find((mensaje) => mensaje.includes("rho")) ??
+          `La carga estimada es rho ≈ ${formatoLocal.format(rhoEstimado)}; interpreta el resultado con cautela.`,
+      }),
+    );
+  }
+}
+
+export function iniciarLaboratorio({
+  formulario,
+  datos,
+  alSimular,
+  alVolverObservados,
+}) {
+  exigirDatos(datos);
+  if (
+    !formulario ||
+    typeof alSimular !== "function" ||
+    typeof alVolverObservados !== "function"
+  ) {
+    throw new TypeError("Faltan elementos o acciones para iniciar el laboratorio.");
+  }
+  const estado = formulario.querySelector("#estado-laboratorio");
+  const botonSimular = formulario.querySelector("#simular-laboratorio");
+  const botonPreajuste = formulario.querySelector("#aplicar-preajuste");
+  const botonNuevaSemilla = formulario.querySelector("#nueva-semilla");
+  const botonObservados = formulario.querySelector("#volver-observados");
+  const resultados = formulario.querySelector("#resultados-laboratorio");
+  const advertencias = formulario.querySelector("#advertencias-laboratorio");
+  const inicial = crearPreajusteLaboratorio(
+    "Actual (2 generales + 1 preferencial)",
+    datos,
+    datos.meta.semilla_usada,
+  );
+  let conteosMemoria = inicial.conteos;
+  aplicarEstado(formulario, inicial);
+
+  function refrescarValidacion() {
+    const validacion = validarEntradaLaboratorio(
+      leerEntrada(formulario, conteosMemoria),
+      datos,
+    );
+    mostrarErrores(formulario, validacion.errores);
+    advertencias.replaceChildren(
+      ...validacion.advertencias.map((mensaje) =>
+        nodo("p", { clase: "estado estado-advertencia", texto: mensaje }),
+      ),
+    );
+    botonSimular.disabled = validacion.errores.length > 0;
+  }
+
+  formulario.addEventListener("click", async (evento) => {
+    const boton = evento.target.closest("button");
+    if (!boton) return;
+    const accion = boton.dataset.accionVentanilla;
+    if (accion) {
+      const entrada = leerEntrada(formulario, conteosMemoria);
+      conteosMemoria = entrada.conteos;
+      const indice = Number(boton.closest("fieldset").dataset.indice);
+      if (accion === "duplicar" && entrada.ventanillas.length < MAXIMO_VENTANILLAS) {
+        const original = entrada.ventanillas[indice];
+        entrada.ventanillas.splice(indice + 1, 0, {
+          nombre: `${original.nombre} copia`.slice(0, 40),
+          atiende: [...original.atiende],
+        });
+      } else if (accion === "quitar" && entrada.ventanillas.length > 1) {
+        entrada.ventanillas.splice(indice, 1);
+      }
+      renderizarVentanillas(formulario, entrada.ventanillas);
+      refrescarValidacion();
+      return;
+    }
+    if (boton.id === "agregar-ventanilla") {
+      const entrada = leerEntrada(formulario, conteosMemoria);
+      conteosMemoria = entrada.conteos;
+      if (entrada.ventanillas.length < MAXIMO_VENTANILLAS) {
+        entrada.ventanillas.push({
+          nombre: `Ventanilla ${entrada.ventanillas.length + 1}`,
+          atiende: ["General"],
+        });
+        renderizarVentanillas(formulario, entrada.ventanillas);
+        refrescarValidacion();
+      }
+      return;
+    }
+    if (boton.id === "aplicar-preajuste") {
+      const entrada = leerEntrada(formulario, conteosMemoria);
+      conteosMemoria = entrada.conteos;
+      const nuevo = crearPreajusteLaboratorio(
+        control(formulario, "nombre_preajuste").value,
+        datos,
+        entrada.semilla,
+      );
+      nuevo.conteos = conteosMemoria;
+      aplicarEstado(formulario, nuevo);
+      refrescarValidacion();
+      return;
+    }
+    if (boton.id === "nueva-semilla") {
+      const semilla = numero(formulario, "semilla");
+      control(formulario, "semilla").value = String(
+        Number.isInteger(semilla) && semilla < 2147483647 ? semilla + 1 : 1,
+      );
+      refrescarValidacion();
+      return;
+    }
+    if (boton.id === "volver-observados") {
+      resultados.hidden = true;
+      estado.textContent = "Reproduciendo de nuevo los datos observados.";
+      estado.className = "estado";
+      alVolverObservados();
+      return;
+    }
+    if (boton.id !== "simular-laboratorio") return;
+
+    botonSimular.disabled = true;
+    estado.textContent = "Validando y ejecutando la simulación…";
+    estado.className = "estado";
+    await new Promise((resolver) => setTimeout(resolver, 0));
+    try {
+      const entrada = leerEntrada(formulario, conteosMemoria);
+      conteosMemoria = entrada.conteos;
+      const armado = crearConfiguracionLaboratorio(entrada, datos);
+      const corrida = simular(armado.configuracion);
+      const metricas = calcularMetricas(corrida, armado.criterio);
+      mostrarMetricas(
+        resultados,
+        metricas,
+        armado.rhoEstimado,
+        armado.advertencias,
+      );
+      resultados.hidden = false;
+      estado.textContent =
+        `Corrida completada: ${metricas.n} pacientes; Wq ${formatoLocal.format(metricas.Wq)} min.`;
+      estado.className = "estado estado-correcto";
+      await alSimular({
+        corrida,
+        metricas,
+        configuracion: armado.configuracion,
+        criterio: armado.criterio,
+        rhoEstimado: armado.rhoEstimado,
+        advertencias: armado.advertencias,
+      });
+    } catch (error) {
+      const validacion = validarEntradaLaboratorio(
+        leerEntrada(formulario, conteosMemoria),
+        datos,
+      );
+      if (validacion.errores.length) {
+        mostrarErrores(formulario, validacion.errores);
+        estado.textContent = validacion.errores[0].mensaje;
+      } else {
+        estado.textContent = `No fue posible simular: ${error.message}`;
+      }
+      estado.className = "estado estado-error";
+    } finally {
+      botonSimular.disabled = false;
+    }
+  });
+
+  formulario.addEventListener("input", () => {
+    conteosMemoria = leerEntrada(formulario, conteosMemoria).conteos;
+    refrescarValidacion();
+  });
+  formulario.addEventListener("change", (evento) => {
+    conteosMemoria = leerEntrada(formulario, conteosMemoria).conteos;
+    if (evento.target.name === "diaConteos") {
+      renderizarConteos(
+        formulario,
+        conteosMemoria.length ? conteosMemoria : inicial.conteos,
+        evento.target.value,
+      );
+    }
+    actualizarVisibilidad(formulario);
+    refrescarValidacion();
+  });
+  botonPreajuste.type = "button";
+  botonNuevaSemilla.type = "button";
+  botonObservados.type = "button";
+  refrescarValidacion();
+}
+
+export const MAX_PACIENTES_LABORATORIO = MAXIMO_PACIENTES;
+export const PREAJUSTES_LABORATORIO = [
+  "Actual (2 generales + 1 preferencial)",
+  "Con apoyo",
+  "Una sola cola compartida",
+  "Cuarta ventanilla",
+];
