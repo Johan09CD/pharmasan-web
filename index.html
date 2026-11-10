@@ -49,6 +49,7 @@
             <div><dt>Reloj</dt><dd id="hud-reloj">08:00</dd></div>
             <div><dt>Llegados</dt><dd id="hud-llegados">0</dd></div>
             <div><dt>Atendidos</dt><dd id="hud-atendidos">0</dd></div>
+            <div><dt>Esperaron</dt><dd id="hud-esperaron">0</dd></div>
             <div><dt>Filas G / P</dt><dd id="hud-filas">0 / 0</dd></div>
             <div><dt>Wq</dt><dd id="hud-wq">—</dd></div>
           </dl>
@@ -56,9 +57,15 @@
             <button id="saltar-anterior" type="button" aria-label="Saltar al instante anterior" aria-keyshortcuts="ArrowLeft">←</button>
             <button id="alternar-reproduccion" type="button" disabled aria-keyshortcuts="Space">Reproducir</button>
             <button id="saltar-siguiente" type="button" aria-label="Saltar al instante siguiente" disabled aria-keyshortcuts="ArrowRight">→</button>
+            <button id="reiniciar-reproduccion" type="button" aria-label="Reiniciar reproducción" disabled>↺</button>
           </div>
-          <label class="solo-lectores" for="posicion-reproduccion">Instante de reproducción</label>
+          <label class="solo-lectores" for="posicion-reproduccion">Tiempo de simulación</label>
           <input id="posicion-reproduccion" class="barra-tiempo" type="range" min="0" max="0" value="0" disabled>
+          <label class="controles-velocidad" for="velocidad-reproduccion">
+            <span>Velocidad</span>
+            <input id="velocidad-reproduccion" type="range" min="0.5" max="30" step="0.5" value="1" disabled>
+            <output id="valor-velocidad" for="velocidad-reproduccion">1×</output>
+          </label>
           <p id="estado-reproduccion" class="ayuda">
             Espacio: reproducir/pausar · ←/→: saltar · 1/2/3: vistas.
           </p>

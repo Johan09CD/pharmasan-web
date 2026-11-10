@@ -210,6 +210,13 @@ kbd {
   height: 100%;
 }
 
+.escena-local .etiquetas-personas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
 .escena-local[data-calidad="reducida"]::after {
   position: absolute;
   right: 0.55rem;
@@ -304,7 +311,7 @@ kbd {
 
 .controles-reproduccion {
   display: grid;
-  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  grid-template-columns: 44px minmax(0, 1fr) 44px 44px;
   gap: 0.45rem;
   margin: 0.65rem 0 0.3rem;
 }
@@ -319,6 +326,29 @@ kbd {
   min-height: 28px;
   margin: 0.2rem 0;
   accent-color: #27664b;
+}
+
+.controles-velocidad {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.4rem;
+  align-items: center;
+  margin: 0.35rem 0;
+  color: #496258;
+  font-size: 0.78rem;
+}
+
+.controles-velocidad input {
+  width: 100%;
+  min-width: 0;
+  accent-color: #27664b;
+}
+
+.controles-velocidad output {
+  min-width: 3.2rem;
+  color: #18352b;
+  font-weight: 700;
+  text-align: right;
 }
 
 .ayuda {

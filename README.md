@@ -86,6 +86,19 @@ reproducción, espacio alterna pausa, ←/→ salta entre instantes y 1/2/3 camb
 entre las vistas cenital, isométrica y frontal. En móvil se activa calidad
 reducida y se deshabilitan las sombras.
 
+La Entrega A anima personas low-poly desde los eventos: entrada, fila,
+ventanilla y salida; el tipo determina su color y un anillo indica la espera
+frente a las metas de 2 y 5 minutos. Los estados de las ventanillas y sus barras
+de servicio siguen las marcas de inicio y fin del registro, sin recalcular
+métricas. Los controles existentes incluyen reinicio y velocidad de 0,5× a
+30×. Los días seleccionados se reproducen por separado y, al cierre de cada
+corrida, el HUD muestra el resumen ya comparado con la tabla.
+
+La aplicación mide los fps del render y los presenta en el estado de la escena.
+En la prueba de navegador a 1366×768, la selección de jornada completa con 131
+pacientes y un máximo simultáneo de cuatro registró 23–28 fps en cuatro
+muestras consecutivas; el objetivo de 30 fps no se sostuvo en ese navegador.
+
 Ejecuta todas las pruebas con:
 
 ```powershell

@@ -90,3 +90,34 @@
   animación de pacientes. En Playwright se verificó el encuadre 1366×768 y
   390×844: sin solapamiento de escena/HUD y sin overflow horizontal. El
   objetivo de 30 fps aún requiere medirlo en equipos reales.
+- Los eventos del motor incluyen `paciente_tipo` como dato aditivo para
+  etiquetar y colorear las personas que esperan; la adición no participa en el
+  calendario ni altera resultados o métricas. `src/escena/personas.js` deriva
+  fotogramas, ventanillas, filas y transiciones únicamente de esos eventos.
+  Los recorridos interpolan entrada, cambios de fila/ventanilla y salida en
+  ventanas visuales de 0,12, 0,12 y 0,35 minutos a partir de las marcas de
+  evento; son constantes de animación, no tiempos de atención observados. Las
+  esperas y el Wq no se recalculan en la animación. El Wq que aparece al cierre
+  proviene del resumen ya generado por la comparación observada.
+- La escena representa personas low-poly con instancias compartidas, ID en
+  etiquetas superpuestas y anillos de espera verde/amarillo/rojo según los
+  umbrales de 2 y 5 minutos. Cada ventanilla cambia su indicador de libre a
+  ocupada y su barra refleja el avance entre el inicio y fin registrados. El
+  servicio no altera la posición de una persona hasta que el evento registra
+  su inicio; al reiniciar se desmontan y liberan las geometrías y materiales
+  dinámicos, dejando el estado inicial sin personas.
+- Los controles ya existentes se conectan a la reproducción de eventos e
+  incorporan reinicio y velocidad de 0,5× a 30×. Los días se reproducen como
+  corridas separadas; al cerrar cada una, el HUD presenta el agregado ya
+  comparado con la tabla y la reproducción se pausa antes del siguiente día.
+  En la selección «Los tres», hora pico, se conserva la referencia de 71
+  pacientes, 7 esperas y Wq de 0,155 min. No se inició el resumen final ni la
+  exportación CSV (Entrega B), que espera la aprobación de la captura.
+- La carga de jornada completa reúne 131 pacientes en las tres corridas, no
+  simultáneos: los snapshots observados alcanzan un máximo de 4 personas en
+  sistema. A partir de 120 pacientes se activa calidad reducida y sombras
+  apagadas; el pixel ratio de escritorio se limita a 0,5 y el antialiasing WebGL
+  se desactiva para priorizar fluidez. En Playwright 1366×768, con carga de 131
+  pacientes y cuatro visibles, se midieron 23–28 fps en cuatro muestras
+  consecutivas. El objetivo de 30 fps no se sostuvo en ese navegador de prueba;
+  se debe comunicar este límite y no presentarlo como rendimiento garantizado.

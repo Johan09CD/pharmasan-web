@@ -33,6 +33,7 @@ const hud = {
   reloj: document.querySelector("#hud-reloj"),
   llegados: document.querySelector("#hud-llegados"),
   atendidos: document.querySelector("#hud-atendidos"),
+  esperaron: document.querySelector("#hud-esperaron"),
   filas: document.querySelector("#hud-filas"),
   wq: document.querySelector("#hud-wq"),
   preferenciales: document.querySelector("#hud-preferenciales"),
@@ -42,6 +43,9 @@ const hud = {
   alternar: document.querySelector("#alternar-reproduccion"),
   anterior: document.querySelector("#saltar-anterior"),
   siguiente: document.querySelector("#saltar-siguiente"),
+  reiniciar: document.querySelector("#reiniciar-reproduccion"),
+  velocidad: document.querySelector("#velocidad-reproduccion"),
+  valorVelocidad: document.querySelector("#valor-velocidad"),
   estado: document.querySelector("#estado-reproduccion"),
 };
 const numeroReplicas = 500;
@@ -249,10 +253,15 @@ function mostrarLineaTiempo(pacientes, datos) {
 }
 
 function crearControlReproduccion() {
+  let corridas = [];
+  let resumen = null;
   let instantes = [];
-  let pacientes = [];
-  let indice = 0;
+  let duracionTotal = 0;
+  let tiempoGlobal = 0;
+  let corridaActual = -1;
+  let corridaEnPausa = null;
   let temporizador;
+  let ultimaMarca;
 
   function detener() {
     if (temporizador !== undefined) {
@@ -260,48 +269,96 @@ function crearControlReproduccion() {
       temporizador = undefined;
     }
     hud.alternar.textContent = "Reproducir";
-    hud.estado.textContent = "Pausada · Espacio: reproducir/pausar · ←/→: saltar · 1/2/3: vistas.";
+    ultimaMarca = undefined;
   }
 
-  function mostrarInstante() {
-    if (instantes.length === 0) {
+  function mostrarTiempo() {
+    if (corridas.length === 0) {
       return;
     }
 
-    const tiempo = instantes[indice];
-    const llegados = pacientes.filter((paciente) => paciente.llegada <= tiempo);
-    const atendidos = pacientes.filter((paciente) => paciente.fin <= tiempo);
-    const esperando = llegados.filter((paciente) => paciente.inicio > tiempo);
-    const enServicio = llegados.filter(
-      (paciente) => paciente.inicio <= tiempo && paciente.fin > tiempo,
+    tiempoGlobal = Math.max(0, Math.min(duracionTotal, tiempoGlobal));
+    let indiceCorrida =
+      corridaEnPausa ??
+      corridas.findIndex(
+        (corrida, indice) =>
+          tiempoGlobal < corrida.inicio + corrida.duracion ||
+          indice === corridas.length - 1,
+      );
+    if (indiceCorrida < 0) {
+      indiceCorrida = corridas.length - 1;
+    }
+    const corrida = corridas[indiceCorrida];
+    if (corridaActual !== indiceCorrida) {
+      escenaLocal?.actualizarCalidad(resumen.resultados.pacientes);
+      escenaLocal?.cargarEventos(corrida.eventos);
+      corridaActual = indiceCorrida;
+    }
+    const tiempoLocal = Math.max(
+      0,
+      Math.min(corrida.duracion, tiempoGlobal - corrida.inicio),
     );
-    const preferenciales = llegados.filter(
-      (paciente) => paciente.tipo === "Preferencial",
+    const eventos = corrida.eventos.filter(
+      (evento) => evento.tiempo <= tiempoLocal,
     );
-    const esperaPromedio =
-      llegados.length === 0
-        ? 0
-        : llegados.reduce((suma, paciente) => suma + paciente.espera, 0) /
-          llegados.length;
-    const colaGeneral = esperando.filter(
-      (paciente) => paciente.tipo === "General",
+    const eventosPrevios = corridas
+      .slice(0, indiceCorrida)
+      .flatMap((elemento) => elemento.eventos);
+    const llegadasPrevias = eventosPrevios
+      .filter((evento) => evento.tipo === "llegada");
+    const finalesPrevios = eventosPrevios
+      .filter((evento) => evento.tipo === "fin_servicio");
+    const llegadasActuales = eventos.filter((evento) => evento.tipo === "llegada");
+    const finalesActuales = eventos.filter((evento) => evento.tipo === "fin_servicio");
+    const estadoActual = eventos.at(-1)?.estado;
+    const filas = estadoActual?.filas ?? {};
+    const colaGeneral = (filas.General ?? []).length;
+    const colaPreferencial = (filas.Preferencial ?? []).length;
+    const enServicio = (estadoActual?.ventanillas ?? []).filter(
+      (ventanilla) => ventanilla.ocupada,
     ).length;
-    const colaPreferencial = esperando.filter(
-      (paciente) => paciente.tipo === "Preferencial",
+    const preferenciales = [...llegadasPrevias, ...llegadasActuales].filter(
+      (evento) => evento.paciente_tipo === "Preferencial",
     ).length;
+    const esperaronEnEventos = [...llegadasPrevias, ...llegadasActuales].filter(
+      (llegada) =>
+        Object.values(llegada.estado.filas).some((ids) =>
+          ids.includes(llegada.paciente_id),
+        ),
+    ).length;
+    const colaMaxima = [...eventosPrevios, ...eventos].reduce(
+      (maximo, evento) =>
+        Math.max(
+          maximo,
+          Object.values(evento.estado.filas).reduce(
+            (total, ids) => total + ids.length,
+            0,
+          ),
+        ),
+      0,
+    );
+    const alFinal = tiempoLocal >= corrida.duracion;
+    const llegados = llegadasPrevias.length + llegadasActuales.length;
+    const atendidos = finalesPrevios.length + finalesActuales.length;
+    escenaLocal?.actualizarTiempo(tiempoLocal);
 
-    hud.reloj.textContent = formatoHoraObservada(tiempo);
-    hud.llegados.textContent = String(llegados.length);
-    hud.atendidos.textContent = String(atendidos.length);
+    hud.reloj.textContent = formatoHoraObservada(tiempoLocal);
+    hud.llegados.textContent = String(alFinal ? resumen.resultados.pacientes : llegados);
+    hud.atendidos.textContent = String(alFinal ? resumen.resultados.pacientes : atendidos);
+    hud.esperaron.textContent = String(
+      alFinal ? resumen.resultados.esperaron : esperaronEnEventos,
+    );
     hud.filas.textContent = `${colaGeneral} / ${colaPreferencial}`;
-    hud.wq.textContent = `${formatoMinutos.format(esperaPromedio)} min`;
-    hud.preferenciales.textContent = String(preferenciales.length);
-    hud.enServicio.textContent = String(enServicio.length);
-    hud.colaMaxima.textContent = String(esperando.length);
-    hud.posicion.value = String(indice);
+    hud.wq.textContent = alFinal
+      ? `${formatoMinutos.format(resumen.resultados.Wq)} min`
+      : "—";
+    hud.preferenciales.textContent = String(preferenciales);
+    hud.enServicio.textContent = String(enServicio);
+    hud.colaMaxima.textContent = String(colaMaxima);
+    hud.posicion.value = String(Math.round(tiempoGlobal * 100));
     hud.estado.textContent =
       `${temporizador ? "Reproduciendo" : "Pausada"} · ` +
-      `${indice + 1} de ${instantes.length} instantes.`;
+      `${corrida.dia} · ${formatoHoraObservada(tiempoLocal)}.`;
   }
 
   function saltar(cantidad) {
@@ -309,74 +366,148 @@ function crearControlReproduccion() {
       return;
     }
     detener();
-    indice = Math.max(0, Math.min(instantes.length - 1, indice + cantidad));
-    mostrarInstante();
+    if (corridaEnPausa !== null) {
+      corridaEnPausa = null;
+      corridaActual = -1;
+      mostrarTiempo();
+    }
+    const siguiente =
+      cantidad > 0
+        ? instantes.find((instante) => instante > tiempoGlobal + 1e-6)
+        : [...instantes].reverse().find((instante) => instante < tiempoGlobal - 1e-6);
+    tiempoGlobal =
+      siguiente ?? (cantidad > 0 ? duracionTotal : 0);
+    corridaActual = -1;
+    mostrarTiempo();
   }
 
   function alternar() {
-    if (instantes.length === 0) {
+    if (corridas.length === 0) {
       return;
     }
     if (temporizador !== undefined) {
       detener();
-      mostrarInstante();
+      mostrarTiempo();
       return;
     }
-    if (indice >= instantes.length - 1) {
-      indice = 0;
-      mostrarInstante();
+    if (corridaEnPausa !== null) {
+      corridaEnPausa = null;
+      corridaActual = -1;
+      mostrarTiempo();
+    }
+    if (corridaActual < 0) {
+      mostrarTiempo();
+    }
+    if (tiempoGlobal >= duracionTotal) {
+      tiempoGlobal = 0;
+      corridaActual = -1;
+      mostrarTiempo();
     }
     hud.alternar.textContent = "Pausar";
-    hud.estado.textContent = "Reproduciendo los instantes de llegada y atención…";
+    ultimaMarca = performance.now();
     temporizador = window.setInterval(() => {
-      if (indice >= instantes.length - 1) {
+      const ahora = performance.now();
+      const incremento =
+        ((ahora - ultimaMarca) / 1000) * Number(hud.velocidad.value);
+      ultimaMarca = ahora;
+      const corrida = corridas[corridaActual];
+      const finDia = corrida?.inicio + corrida?.duracion;
+      if (
+        corrida &&
+        corridaActual < corridas.length - 1 &&
+        tiempoGlobal + incremento >= finDia
+      ) {
+        tiempoGlobal = finDia;
+        corridaEnPausa = corridaActual;
         detener();
-        mostrarInstante();
+        mostrarTiempo();
         return;
       }
-      indice += 1;
-      mostrarInstante();
-    }, 140);
+      tiempoGlobal += incremento;
+      if (tiempoGlobal >= duracionTotal) {
+        tiempoGlobal = duracionTotal;
+        detener();
+      }
+      mostrarTiempo();
+    }, 32);
   }
 
-  function cargar(pacientesSeleccionados) {
+  function reiniciar() {
     detener();
-    pacientes = pacientesSeleccionados;
-    instantes = [
-      ...new Set(
-        pacientes.flatMap((paciente) => [
-          paciente.llegada,
-          paciente.inicio,
-          paciente.fin,
-        ]),
-      ),
-    ].sort((a, b) => a - b);
-    indice = 0;
+    escenaLocal?.reiniciarAnimacion();
+    corridaActual = -1;
+    corridaEnPausa = null;
+    tiempoGlobal = 0;
+    hud.reloj.textContent = "08:00";
+    hud.llegados.textContent = "0";
+    hud.atendidos.textContent = "0";
+    hud.esperaron.textContent = "0";
+    hud.filas.textContent = "0 / 0";
+    hud.wq.textContent = "—";
+    hud.preferenciales.textContent = "0";
+    hud.enServicio.textContent = "0";
+    hud.colaMaxima.textContent = "—";
+    hud.posicion.value = "0";
+    hud.estado.textContent = "Pausada · Reproducción reiniciada.";
+  }
+
+  function cargar(corridasNuevas, resumenNuevo) {
+    detener();
+    corridas = [];
+    resumen = resumenNuevo;
+    duracionTotal = 0;
+    instantes = [];
+    for (const [indice, corrida] of corridasNuevas.entries()) {
+      const duracion = Math.max(0, ...corrida.eventos.map((evento) => evento.tiempo));
+      corridas.push({
+        ...corrida,
+        dia: corrida.dia ?? `Día ${indice + 1}`,
+        inicio: duracionTotal,
+        duracion,
+      });
+      for (const evento of corrida.eventos) {
+        instantes.push(duracionTotal + evento.tiempo);
+      }
+      duracionTotal += duracion;
+    }
+    instantes = [...new Set(instantes)].sort((a, b) => a - b);
+    tiempoGlobal = 0;
+    corridaActual = -1;
+    corridaEnPausa = null;
     hud.posicion.min = "0";
-    hud.posicion.max = String(Math.max(0, instantes.length - 1));
+    hud.posicion.max = String(Math.max(0, Math.ceil(duracionTotal * 100)));
     hud.posicion.value = "0";
     hud.posicion.disabled = instantes.length === 0;
     hud.alternar.disabled = instantes.length === 0;
     hud.anterior.disabled = instantes.length === 0;
     hud.siguiente.disabled = instantes.length === 0;
-    mostrarInstante();
+    hud.reiniciar.disabled = instantes.length === 0;
+    hud.velocidad.disabled = instantes.length === 0;
+    mostrarTiempo();
     detener();
-    mostrarInstante();
+    mostrarTiempo();
   }
 
   hud.alternar.addEventListener("click", alternar);
   hud.anterior.addEventListener("click", () => saltar(-1));
   hud.siguiente.addEventListener("click", () => saltar(1));
+  hud.reiniciar.addEventListener("click", reiniciar);
+  hud.velocidad.addEventListener("input", () => {
+    hud.valorVelocidad.value = `${hud.velocidad.value}×`;
+  });
   hud.posicion.addEventListener("input", () => {
     detener();
-    indice = Number(hud.posicion.value);
-    mostrarInstante();
+    corridaEnPausa = null;
+    corridaActual = -1;
+    tiempoGlobal = Number(hud.posicion.value) / 100;
+    mostrarTiempo();
   });
 
   return {
     alternar,
     cargar,
     saltar,
+    reiniciar,
   };
 }
 
@@ -410,6 +541,14 @@ try {
     estadoEscena.textContent = evento.detail.reducida
       ? `Calidad reducida automáticamente para ${evento.detail.cantidadPersonas} personas.`
       : "Maqueta lista: 60 espacios de fila, 12 sillas y controles orbitales.";
+  });
+  contenedorEscena.addEventListener("rendimientoescena", (evento) => {
+    if (evento.detail.cantidadPersonas > 0) {
+      estadoEscena.textContent =
+        `Escena: ${evento.detail.fps} fps medidos con carga de ` +
+        `${evento.detail.cantidadPersonas} pacientes; ` +
+        `${evento.detail.personasVisibles} visibles en este instante.`;
+    }
   });
   document
     .querySelector('[data-vista="isometrica"]')
@@ -502,8 +641,11 @@ botonReplay.addEventListener("click", async () => {
       datosObservados,
       seleccion,
     );
-    const pacientesReproducidos = configuraciones.flatMap((configuracion) =>
-      simular(configuracion).pacientes,
+    const corridasReproducidas = configuraciones.map((configuracion) =>
+      simular(configuracion),
+    );
+    const pacientesReproducidos = corridasReproducidas.flatMap(
+      (corrida) => corrida.pacientes,
     );
     const comparacion = compararReproduccionObservada(
       datosObservados,
@@ -520,7 +662,15 @@ botonReplay.addEventListener("click", async () => {
     mostrarTablaPacientes(comparacion.pacientes, datosObservados);
     mostrarLineaTiempo(comparacion.pacientes, datosObservados);
     escenaLocal?.actualizarCalidad(comparacion.pacientes.length);
-    controlReproduccion.cargar(comparacion.pacientes);
+    controlReproduccion.cargar(
+      corridasReproducidas.map((corrida, indice) => ({
+        eventos: corrida.eventos,
+        dia:
+          configuraciones[indice].llegadas.pacientes[0]?.dia ??
+          (seleccion.dia === "Los tres" ? `Día ${indice + 1}` : seleccion.dia),
+      })),
+      comparacion,
+    );
     resumenSeleccion.textContent =
       `${seleccion.dia} · ${tramo} · ${comparacion.resultados.pacientes} pacientes.`;
     resultadosReplay.hidden = false;

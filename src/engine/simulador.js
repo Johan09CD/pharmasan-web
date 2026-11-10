@@ -511,6 +511,7 @@ export function simular(configuracion) {
       tipo,
       tiempo,
       paciente_id: paciente.id,
+      paciente_tipo: paciente.tipo,
       estado: copiarEstado(filas, ventanillas),
     });
   }

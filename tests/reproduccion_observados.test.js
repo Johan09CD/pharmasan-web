@@ -55,6 +55,13 @@ test("configura replay de las observaciones por día sin combinar días en una s
     ["Lunes", "Martes", "Viernes"],
   );
   assert.ok(
+    configuraciones.every((configuracion) =>
+      configuracion.llegadas.pacientes.every((paciente) =>
+        datos.pico.includes(paciente.id),
+      ),
+    ),
+  );
+  assert.ok(
     configuraciones.every(
       (configuracion) =>
         configuracion.llegadas.modo === "replay" &&

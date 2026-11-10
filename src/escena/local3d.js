@@ -1,6 +1,7 @@
 import * as THREE from "../../vendor/three/three.module.js";
 import { OrbitControls } from "../../vendor/three/OrbitControls.js";
 import { crearCamaraEscena } from "./camara.js";
+import { crearControlPersonas } from "./personas.js";
 
 const PALETA = {
   piso: 0xe9e6de,
@@ -540,6 +541,14 @@ function crearFondo(escena) {
   escena.add(luzSol);
 }
 
+function colorGrupo(tipo) {
+  return tipo === "Preferencial" ? PALETA.preferencial : PALETA.general;
+}
+
+function colorEspera(color) {
+  return { verde: 0x55a86a, amarillo: 0xe7b83f, rojo: 0xd9534f }[color];
+}
+
 export function crearLocal3D(contenedor) {
   if (!contenedor) {
     throw new TypeError("Se requiere el contenedor de la maqueta 3D.");
@@ -548,7 +557,7 @@ export function crearLocal3D(contenedor) {
   const mediaMovil = window.matchMedia("(max-width: 767px)");
   const renderer = new THREE.WebGLRenderer({
     alpha: true,
-    antialias: true,
+    antialias: false,
     powerPreference: "high-performance",
   });
   renderer.setPixelRatio(
@@ -563,7 +572,15 @@ export function crearLocal3D(contenedor) {
     "aria-label",
     "Maqueta tridimensional esquemática de Droguería Pharmasan",
   );
-  contenedor.replaceChildren(renderer.domElement);
+  const etiquetas = document.createElement("canvas");
+  etiquetas.className = "etiquetas-personas";
+  etiquetas.setAttribute("aria-hidden", "true");
+  contenedor.replaceChildren(renderer.domElement, etiquetas);
+  const contextoEtiquetas = etiquetas.getContext("2d");
+  if (!contextoEtiquetas) {
+    renderer.dispose();
+    throw new Error("No se pudieron preparar las etiquetas de pacientes.");
+  }
 
   const escena = new THREE.Scene();
   const recursos = crearGeometrias();
@@ -574,9 +591,271 @@ export function crearLocal3D(contenedor) {
   const camara = crearCamaraEscena(THREE, contenedor, renderer);
 
   let ultimaActualizacion = 0;
+  let comienzoMedicionFps = 0;
+  let cuadrosMedidos = 0;
+  let fpsMedidos = 0;
   let calidadReducida = mediaMovil.matches;
   let cantidadPersonas = 0;
+  const controlPersonas = crearControlPersonas();
+  let frameActual = controlPersonas.obtenerEstado();
+  let mallasPersonas = [];
+  let idsPersonas = [];
+  const vectorProyeccion = new THREE.Vector3();
+  const objetoTemporal = new THREE.Object3D();
+  const coloresInstancia = new Map();
+  function colorInstancia(valor) {
+    if (!coloresInstancia.has(valor)) {
+      coloresInstancia.set(valor, new THREE.Color(valor));
+    }
+    return coloresInstancia.get(valor);
+  }
+  function establecerInstancia(
+    malla,
+    indice,
+    posicion,
+    altura,
+    color,
+    anillo = false,
+    offsetX = 0,
+  ) {
+    objetoTemporal.position.set(
+      posicion[0] + offsetX,
+      altura,
+      posicion[2],
+    );
+    objetoTemporal.rotation.set(anillo ? -Math.PI / 2 : 0, 0, 0);
+    objetoTemporal.scale.setScalar(1);
+    objetoTemporal.updateMatrix();
+    malla.setMatrixAt(indice, objetoTemporal.matrix);
+    malla.setColorAt(indice, colorInstancia(color));
+  }
+  const materialesIndicadores = {
+    libre: recursos.material(0x84a78b, { emissive: 0x18351f }),
+    ocupado: recursos.material(0xe4a63b, { emissive: 0x60300d }),
+    progreso: recursos.material(0x52a879, { emissive: 0x1b452b }),
+  };
+  const indicadores = [-4.65, -0.5, 4.35].map((x) => {
+    const luz = new THREE.Mesh(
+      recursos.geometriaCaja(0.26, 0.18, 0.08),
+      materialesIndicadores.libre,
+    );
+    luz.position.set(x, 1.57, -1.02);
+    const fondoBarra = new THREE.Mesh(
+      recursos.geometriaCaja(1.7, 0.09, 0.06),
+      recursos.material(0x7d8179),
+    );
+    fondoBarra.position.set(x, 1.38, -1.02);
+    const barra = new THREE.Mesh(
+      recursos.geometriaCaja(1.62, 0.055, 0.035),
+      materialesIndicadores.progreso,
+    );
+    barra.position.set(x - 0.81, 1.38, -0.97);
+    barra.scale.x = 0;
+    barra.visible = false;
+    escena.add(luz, fondoBarra, barra);
+    return { luz, barra, x };
+  });
   contenedor.dataset.calidad = calidadReducida ? "reducida" : "completa";
+
+  function liberarPersonas() {
+    for (const malla of mallasPersonas) {
+      escena.remove(malla);
+      malla.geometry.dispose();
+      malla.material.dispose();
+    }
+    mallasPersonas = [];
+    idsPersonas = [];
+    frameActual = controlPersonas.reiniciar();
+    contextoEtiquetas.clearRect(0, 0, etiquetas.width, etiquetas.height);
+    for (const indicador of indicadores) {
+      indicador.luz.material = materialesIndicadores.libre;
+      indicador.barra.scale.x = 0;
+      indicador.barra.visible = false;
+    }
+  }
+
+  function crearPersonas(eventos) {
+    idsPersonas = [...new Set(eventos.map((evento) => evento.paciente_id))];
+    const capacidad = Math.max(1, idsPersonas.length, cantidadPersonas);
+    if (idsPersonas.length === 0 && capacidad === 1) {
+      return;
+    }
+    const materialCuerpo = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      roughness: 0.86,
+    });
+    const materialCabeza = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      roughness: 0.9,
+    });
+    const materialPiernas = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      roughness: 0.9,
+    });
+    const materialAnillos = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      side: THREE.DoubleSide,
+    });
+    const componentes = [
+      new THREE.InstancedMesh(
+        new THREE.CylinderGeometry(0.22, 0.3, 0.78, 6),
+        materialCuerpo,
+        capacidad,
+      ),
+      new THREE.InstancedMesh(
+        new THREE.IcosahedronGeometry(0.22, 0),
+        materialCabeza,
+        capacidad,
+      ),
+      new THREE.InstancedMesh(
+        new THREE.BoxGeometry(0.16, 0.42, 0.18),
+        materialPiernas,
+        capacidad * 2,
+      ),
+      new THREE.InstancedMesh(
+        new THREE.RingGeometry(0.29, 0.37, 16),
+        materialAnillos,
+        capacidad,
+      ),
+    ];
+    for (const malla of componentes) {
+      malla.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+      malla.castShadow = !calidadReducida;
+      const limite = malla === componentes[2] ? capacidad * 2 : capacidad;
+      const inicioOculto = malla === componentes[2] ? idsPersonas.length * 2 : idsPersonas.length;
+      for (let indice = inicioOculto; indice < limite; indice += 1) {
+        objetoTemporal.position.set(0, -100, 0);
+        objetoTemporal.scale.setScalar(1);
+        objetoTemporal.updateMatrix();
+        malla.setMatrixAt(indice, objetoTemporal.matrix);
+      }
+      escena.add(malla);
+      mallasPersonas.push(malla);
+    }
+  }
+
+  function dibujarEtiquetas(personas) {
+    const escala = Math.min(window.devicePixelRatio || 1, 1.5);
+    const ancho = Math.max(1, contenedor.clientWidth);
+    const alto = Math.max(1, contenedor.clientHeight);
+    if (etiquetas.width !== Math.round(ancho * escala)) {
+      etiquetas.width = Math.round(ancho * escala);
+    }
+    if (etiquetas.height !== Math.round(alto * escala)) {
+      etiquetas.height = Math.round(alto * escala);
+    }
+    contextoEtiquetas.setTransform(escala, 0, 0, escala, 0, 0);
+    contextoEtiquetas.clearRect(0, 0, ancho, alto);
+    contextoEtiquetas.font = "700 11px system-ui, sans-serif";
+    contextoEtiquetas.textAlign = "center";
+    contextoEtiquetas.textBaseline = "middle";
+    for (const persona of personas) {
+      vectorProyeccion
+        .set(persona.posicion[0], persona.posicion[1] + 1.9, persona.posicion[2])
+        .project(camara.camara);
+      const x = ((vectorProyeccion.x + 1) * ancho) / 2;
+      const y = ((1 - vectorProyeccion.y) * alto) / 2;
+      if (vectorProyeccion.z < -1 || vectorProyeccion.z > 1) {
+        continue;
+      }
+      const texto = String(persona.id);
+      const anchoEtiqueta = contextoEtiquetas.measureText(texto).width + 10;
+      contextoEtiquetas.fillStyle =
+        persona.tipo === "Preferencial" ? "#8f4e2a" : "#205c45";
+      contextoEtiquetas.beginPath();
+      contextoEtiquetas.roundRect(x - anchoEtiqueta / 2, y - 9, anchoEtiqueta, 18, 5);
+      contextoEtiquetas.fill();
+      contextoEtiquetas.fillStyle = "#fff";
+      contextoEtiquetas.fillText(texto, x, y, anchoEtiqueta - 4);
+    }
+  }
+
+  function actualizarPersonas(tiempo) {
+    frameActual = controlPersonas.actualizar(tiempo);
+    const personasPorId = new Map(
+      frameActual.personas.map((persona) => [persona.id, persona]),
+    );
+    for (let indice = 0; indice < idsPersonas.length; indice += 1) {
+      const persona = personasPorId.get(idsPersonas[indice]);
+      const posicion = persona?.posicion ?? [0, -100, 0];
+      establecerInstancia(
+        mallasPersonas[0],
+        indice,
+        posicion,
+        persona ? 0.92 : -100,
+        persona ? colorGrupo(persona.tipo) : 0xffffff,
+      );
+      establecerInstancia(
+        mallasPersonas[1],
+        indice,
+        posicion,
+        persona ? 1.55 : -100,
+        0xe5bd96,
+      );
+      establecerInstancia(
+        mallasPersonas[2],
+        indice * 2,
+        posicion,
+        persona ? 0.34 : -100,
+        0x34433d,
+        false,
+        -0.12,
+      );
+      establecerInstancia(
+        mallasPersonas[2],
+        indice * 2 + 1,
+        posicion,
+        persona ? 0.34 : -100,
+        0x34433d,
+        false,
+        0.12,
+      );
+      establecerInstancia(
+        mallasPersonas[3],
+        indice,
+        posicion,
+        persona ? 0.06 : -100,
+        colorEspera(persona?.colorEspera ?? "verde"),
+        true,
+      );
+    }
+    for (const malla of mallasPersonas) {
+      malla.instanceMatrix.needsUpdate = true;
+      if (malla.instanceColor) {
+        malla.instanceColor.needsUpdate = true;
+      }
+    }
+    for (const ventanilla of frameActual.ventanillas) {
+      const indice = Number(String(ventanilla.id).replace(/\D/g, "")) - 1;
+      const indicador = indicadores[indice];
+      if (!indicador) {
+        continue;
+      }
+      indicador.luz.material = ventanilla.ocupada
+        ? materialesIndicadores.ocupado
+        : materialesIndicadores.libre;
+      indicador.barra.visible = Boolean(ventanilla.ocupada);
+      const progreso = Math.max(0, Math.min(1, ventanilla.progreso ?? 0));
+      indicador.barra.scale.x = progreso;
+      indicador.barra.position.x = indicador.x - 0.81 + 0.81 * progreso;
+    }
+    dibujarEtiquetas(frameActual.personas);
+  }
+
+  function cargarEventos(eventos) {
+    liberarPersonas();
+    frameActual = controlPersonas.cargar(eventos);
+    crearPersonas(eventos);
+  }
+
+  function actualizarTiempo(tiempo) {
+    actualizarPersonas(tiempo);
+  }
+
+  function reiniciarAnimacion() {
+    liberarPersonas();
+    actualizarCalidad(0);
+  }
 
   function actualizarCalidad(cantidad) {
     const reducida =
@@ -590,11 +869,14 @@ export function crearLocal3D(contenedor) {
     renderer.setPixelRatio(
       Math.min(
         window.devicePixelRatio || 1,
-        mediaMovil.matches ? 0.7 : calidadReducida ? 0.85 : 1.5,
+        mediaMovil.matches ? 0.7 : calidadReducida ? 0.5 : 1.5,
       ),
     );
     renderer.shadowMap.enabled = !calidadReducida;
     renderer.shadowMap.needsUpdate = true;
+    for (const malla of mallasPersonas) {
+      malla.castShadow = !calidadReducida;
+    }
     camara.redimensionar();
     contenedor.dataset.calidad = calidadReducida
       ? "reducida"
@@ -609,8 +891,26 @@ export function crearLocal3D(contenedor) {
   function animar(tiempo) {
     if (tiempo - ultimaActualizacion >= 1000 / FPS_OBJETIVO) {
       camara.controles.update();
+      dibujarEtiquetas(frameActual.personas);
       renderer.render(escena, camara.camara);
       ultimaActualizacion = tiempo;
+      cuadrosMedidos += 1;
+      if (comienzoMedicionFps === 0) {
+        comienzoMedicionFps = tiempo;
+      } else if (tiempo - comienzoMedicionFps >= 1000) {
+        fpsMedidos = (cuadrosMedidos * 1000) / (tiempo - comienzoMedicionFps);
+        comienzoMedicionFps = tiempo;
+        cuadrosMedidos = 0;
+        contenedor.dispatchEvent(
+          new CustomEvent("rendimientoescena", {
+            detail: {
+              fps: Math.round(fpsMedidos),
+              cantidadPersonas,
+              personasVisibles: frameActual.personas.length,
+            },
+          }),
+        );
+      }
     }
   }
 
@@ -625,18 +925,25 @@ export function crearLocal3D(contenedor) {
     establecerVista: camara.establecerVista,
     vistas: camara.vistas,
     actualizarCalidad,
+    cargarEventos,
+    actualizarTiempo,
+    reiniciarAnimacion,
     obtenerEstado: () => ({
       calidadReducida,
       cantidadPersonas,
       espaciosFila,
       sillas: sillas,
       fpsObjetivo: FPS_OBJETIVO,
+      fpsMedidos,
+      personasVisibles: frameActual.personas.length,
+      tiempo: frameActual.tiempo ?? 0,
     }),
     dispose() {
       renderer.setAnimationLoop(null);
       observador.disconnect();
       mediaMovil.removeEventListener("change", alCambiarDispositivo);
       camara.controles.dispose();
+      liberarPersonas();
       escena.traverse((objeto) => {
         if (objeto.isMesh || objeto.isInstancedMesh) {
           objeto.geometry?.dispose();
@@ -651,6 +958,7 @@ export function crearLocal3D(contenedor) {
       });
       renderer.dispose();
       renderer.domElement.remove();
+      etiquetas.remove();
     },
   };
 }

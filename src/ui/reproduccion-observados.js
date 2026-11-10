@@ -35,12 +35,13 @@ export function seleccionarPacientesObservados(datos, seleccion = {}) {
 }
 
 export function crearConfiguracionesReproduccion(datos, seleccion = {}) {
-  const { dia } = validarSeleccion(datos, seleccion);
+  const { dia, tramo } = validarSeleccion(datos, seleccion);
   const dias = dia === "Los tres" ? DIAS_PERMITIDOS : [dia];
   const semilla = datos.meta?.semilla_usada;
   if (!Number.isInteger(semilla)) {
     throw new TypeError("Los datos observados requieren una semilla entera exportada.");
   }
+  const idsPico = new Set(datos.pico);
 
   return dias.map((diaObservado, indice) => ({
     ventanillas: [
@@ -50,7 +51,11 @@ export function crearConfiguracionesReproduccion(datos, seleccion = {}) {
     ],
     llegadas: {
       modo: "replay",
-      pacientes: datos.pacientes.filter((paciente) => paciente.dia === diaObservado),
+      pacientes: datos.pacientes.filter(
+        (paciente) =>
+          paciente.dia === diaObservado &&
+          (tramo === "jornada_completa" || idsPico.has(paciente.id)),
+      ),
       ventanilla_observada: true,
     },
     disciplina: "FIFO",

@@ -197,6 +197,9 @@ test("replay observado conserva llegadas, ventanillas y tiempos registrados", as
     assert.equal(paciente.ventanilla, origen.ventanilla);
     assert.equal(paciente.espera, origen.espera_min);
   }
+  for (const evento of resultados.flatMap((resultado) => resultado.eventos)) {
+    assert.equal(evento.paciente_tipo, observados.get(evento.paciente_id).tipo);
+  }
 
   const idsPico = new Set(datos.pico);
   const pacientesPico = reproducidos.filter((paciente) => idsPico.has(paciente.id));

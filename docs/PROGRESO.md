@@ -1,5 +1,33 @@
 # Progreso
 
+## 2026-11-09 — Entrega A: animación de pacientes desde eventos
+
+- **Hecho:** añadidos pacientes low-poly instanciados con identificador y color
+  por grupo; recorridos de entrada, fila, ventanilla y salida interpolados desde
+  el registro de eventos. Los anillos muestran el umbral de espera, las
+  ventanillas cambian de estado y presentan progreso de servicio. Los controles
+  existentes ahora reproducen los eventos por día, incluyen velocidad de
+  0,5×–30× y reinicio con liberación de mallas y materiales dinámicos. La
+  animación no consulta la tabla de pacientes ni modifica métricas; Wq final
+  procede del resumen ya calculado de la comparación observada.
+- **Archivos:** `index.html`, `src/engine/simulador.js`,
+  `src/escena/local3d.js`, `src/escena/personas.js`, `src/ui/app.js`,
+  `src/ui/estilos.css`, `src/ui/reproduccion-observados.js`,
+  `tests/personas.test.js`, `tests/reproduccion_observados.test.js`,
+  `tests/simulador.test.js`, `docs/PLAN.md`, `docs/PROGRESO.md`,
+  `docs/DECISIONES.md` y `README.md`.
+- **Resultados:** «Los tres», hora pico: **71 pacientes**, **7 esperaron** y
+  **Wq = 0,155 min**, iguales a la tabla. Jornada completa: **131 pacientes**;
+  las corridas por día se mantienen separadas y el máximo simultáneo registrado
+  es **4**. `node --test`: **35 aprobadas, 0 fallidas**. Playwright:
+  **1366×768** y **390×844**, sin scroll horizontal; a 390 px la escena mide
+  aproximadamente **45 svh**. Con la carga de 131 pacientes y cuatro visibles,
+  el navegador de prueba midió **23–28 fps** en cuatro muestras consecutivas;
+  no se sostuvo la meta de 30 fps en ese navegador.
+- **Pendiente:** aprobación de la captura de esta entrega. No se inició la
+  Entrega B (resumen final ni CSV); optimizar el rendimiento adicional queda
+  pendiente si se requiere mantener 30 fps en otros equipos.
+
 ## 2026-11-09 — Diseño adaptable prioritario para PC y controles HUD
 
 - **Hecho:** reorganizada la página para usar una escena amplia y columna
